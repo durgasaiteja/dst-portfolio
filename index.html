@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DST. — UX/UI & Product Designer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --bg:      #070710;
+      --bg2:     #0e0e1c;
+      --accent:  #6c5ce7;
+      --accent2: #a29bfe;
+      --coral:   #fd7272;
+      --text:    #eeeef5;
+      --muted:   #6e6e9a;
+      --border:  rgba(108,92,231,0.18);
+      --glow:    rgba(108,92,231,0.25);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; cursor: none; }
+
+    /* ── CURSOR ── */
+    #cur-dot  { width:10px;height:10px;background:var(--accent2);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;mix-blend-mode:difference; }
+    #cur-ring { width:36px;height:36px;border:1.5px solid rgba(162,155,254,.5);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transition:width .3s,height .3s,opacity .3s; }
+    .cur-grow #cur-ring { width:56px;height:56px;opacity:.5; }
+
+    /* ── LOADER ── */
+    #loader { position:fixed;inset:0;background:var(--bg);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem; }
+    .ldr-wm  { font-family:'Space Grotesk',sans-serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:700;letter-spacing:-.04em; }
+    .ldr-wm span { color:var(--accent2); }
+    .ldr-track { width:180px;height:1px;background:rgba(255,255,255,.08);overflow:hidden;position:relative; }
+    .ldr-fill  { position:absolute;left:-100%;top:0;width:100%;height:100%;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2));animation:loadfill 1.8s cubic-bezier(.76,0,.24,1) forwards; }
+    @keyframes loadfill { to { left:0; } }
+
+    /* ── NAV ── */
+    nav { position:fixed;top:0;left:0;right:0;z-index:100;padding:1.6rem 5rem;display:flex;align-items:center;justify-content:space-between;opacity:0; }
+    nav::before { content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(7,7,16,.95) 0%,transparent 100%);pointer-events:none; }
+    .nav-logo { font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;letter-spacing:-.02em;position:relative; }
+    .nav-logo span { color:var(--accent2); }
+    .nav-links { display:flex;gap:2.5rem;list-style:none;position:relative; }
+    .nav-links a { color:var(--muted);text-decoration:none;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;transition:color .3s; }
+    .nav-links a:hover { color:var(--text); }
+    .nav-pill { background:transparent;border:1px solid var(--border);color:var(--text);text-decoration:none;padding:.55rem 1.4rem;border-radius:50px;font-size:.8rem;font-family:'Space Grotesk',sans-serif;position:relative;transition:all .3s; }
+    .nav-pill:hover { background:var(--accent);border-color:var(--accent); }
+
+    /* ── HERO ── */
+    #hero { height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden; }
+    #hero-canvas { position:absolute;inset:0;z-index:0; }
+    #hero::after { content:'';position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse 70% 70% at 50% 50%,transparent 40%,rgba(7,7,16,.85) 100%);pointer-events:none; }
+    .hero-inner { position:relative;z-index:2;text-align:center;padding:0 2rem; }
+    .hero-badge { display:inline-flex;align-items:center;gap:.5rem;border:1px solid var(--border);color:var(--accent2);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;padding:.4rem 1.1rem;border-radius:50px;margin-bottom:2.2rem;opacity:0; }
+    .badge-dot  { width:6px;height:6px;background:var(--accent2);border-radius:50%;animation:pulse 2s ease infinite; }
+    @keyframes pulse { 0%,100%{ box-shadow:0 0 0 0 rgba(162,155,254,.7); } 50%{ box-shadow:0 0 0 6px rgba(162,155,254,0); } }
+    .hero-title { font-family:'Space Grotesk',sans-serif;font-size:clamp(3.2rem,8.5vw,7.5rem);font-weight:700;line-height:.95;letter-spacing:-.04em;margin-bottom:1.6rem; }
+    .hero-title .line { display:block;overflow:hidden; }
+    .hero-title .inner { display:block;transform:translateY(105%); }
+    .hero-title .outline { color:transparent;-webkit-text-stroke:1px rgba(162,155,254,.35); }
+    .hero-sub { color:var(--muted);font-size:clamp(.95rem,1.8vw,1.15rem);line-height:1.8;max-width:520px;margin:0 auto 2.8rem;opacity:0; }
+    .hero-actions { display:flex;gap:1rem;justify-content:center;align-items:center;opacity:0; }
+    .btn-solid { background:var(--accent);color:#fff;padding:.9rem 2.3rem;border-radius:50px;text-decoration:none;font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:500;transition:transform .25s,box-shadow .25s; }
+    .btn-solid:hover { transform:translateY(-3px);box-shadow:0 18px 38px var(--glow); }
+    .btn-ghost { color:var(--muted);text-decoration:none;font-size:.9rem;display:inline-flex;align-items:center;gap:.4rem;transition:color .25s; }
+    .btn-ghost:hover { color:var(--text); }
+    .scroll-hint { position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;z-index:2;opacity:0; }
+    .scroll-hint span { font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted); }
+    .scroll-needle { width:1px;height:44px;background:linear-gradient(to bottom,var(--accent2),transparent);animation:needlePulse 2s ease infinite; }
+    @keyframes needlePulse { 0%,100%{ opacity:.3; } 50%{ opacity:1; } }
+
+    /* ── MARQUEE ── */
+    .marquee-wrap { overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.2rem 0; }
+    .marquee-track { display:flex;gap:4rem;width:max-content;animation:marquee 30s linear infinite; }
+    @keyframes marquee { from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+    .marquee-item { font-family:'Space Grotesk',sans-serif;font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:1.5rem; }
+    .marquee-item::after { content:'◆';color:var(--accent);font-size:.5rem; }
+
+    /* ── STATS ── */
+    #stats { display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border); }
+    .stat-cell { background:var(--bg);padding:3.5rem 2rem;text-align:center; }
+    .stat-num { font-family:'Space Grotesk',sans-serif;font-size:clamp(2.5rem,5vw,4rem);font-weight:700;letter-spacing:-.04em;display:block;background:linear-gradient(135deg,var(--text),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent; }
+    .stat-lbl { font-size:.72rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:.3rem;display:block; }
+
+    /* ── ABOUT ── */
+    #about { max-width:1320px;margin:0 auto;padding:11rem 4rem;display:grid;grid-template-columns:1fr 1.1fr;gap:8rem;align-items:center; }
+    .tag  { font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent2);display:block;margin-bottom:1.4rem; }
+    .h2   { font-family:'Space Grotesk',sans-serif;font-size:clamp(1.9rem,3.5vw,3.2rem);font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:1.4rem; }
+    .body-copy { color:var(--muted);line-height:1.85;font-size:1rem; }
+    .body-copy + .body-copy { margin-top:1rem; }
+    .glass-card { background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:2.8rem;position:relative;overflow:hidden; }
+    .glass-card::before { content:'';position:absolute;top:-40%;right:-40%;width:320px;height:320px;background:radial-gradient(circle,var(--glow) 0%,transparent 70%);pointer-events:none; }
+    .tools-grid { display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:2rem; }
+    .tool-chip { border:1px solid var(--border);background:rgba(108,92,231,.07);color:var(--text);padding:.55rem 1rem;border-radius:8px;font-size:.82rem;text-align:center;transition:all .25s; }
+    .tool-chip:hover { background:rgba(108,92,231,.2);border-color:var(--accent); }
+
+    /* ── WORK ── */
+    #work { padding:6rem 4rem 10rem; }
+    .work-head { max-width:1320px;margin:0 auto 5rem;display:flex;justify-content:space-between;align-items:flex-end; }
+    .work-head-note { color:var(--muted);font-size:.88rem;line-height:1.7;max-width:300px; }
+    .cases { max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem; }
+
+    /* ── CASE CARD ── */
+    .case {
+      display:grid;grid-template-columns:1fr 1fr;
+      border:1px solid var(--border);border-radius:24px;
+      overflow:hidden;background:var(--bg2);
+      transition:border-color .35s,transform .35s;
+      min-height:480px;cursor:none;
+    }
+    .case:hover { border-color:rgba(108,92,231,.5);transform:translateY(-4px); }
+    .case:nth-child(even) { direction:rtl; }
+    .case:nth-child(even) > * { direction:ltr; }
+    .case-info { padding:4rem;display:flex;flex-direction:column;justify-content:space-between; }
+    .case-chips { display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:2rem; }
+    .chip { border:1px solid var(--border);background:rgba(108,92,231,.06);color:var(--muted);padding:.28rem .75rem;border-radius:50px;font-size:.72rem;letter-spacing:.04em; }
+    .case-title { font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,2.5vw,2.3rem);font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:.9rem; }
+    .case-desc { color:var(--muted);line-height:1.75;font-size:.93rem;flex:1; }
+    .case-outcome { margin-top:1.2rem;display:flex;gap:1.5rem;flex-wrap:wrap; }
+    .outcome-stat { display:flex;flex-direction:column; }
+    .outcome-num { font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;color:var(--accent2); }
+    .outcome-lbl { font-size:.72rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase; }
+    .case-cta { display:inline-flex;align-items:center;gap:.5rem;color:var(--accent2);text-decoration:none;font-size:.88rem;font-weight:500;margin-top:2rem;transition:gap .25s;background:none;border:none;cursor:none;font-family:'Inter',sans-serif; }
+    .case-cta:hover { gap:1rem; }
+
+    /* ── CASE VISUAL — DEVICE MOCKUPS ── */
+    .case-vis {
+      position:relative;overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+      min-height:340px;
+    }
+    /* Atmosphere gradient behind the mockups */
+    .vis-atmo {
+      position:absolute;inset:0;z-index:0;
+    }
+    /* Scene that holds the mockup frames */
+    .mockup-scene {
+      position:relative;z-index:2;
+      display:flex;align-items:center;justify-content:center;
+      gap:1rem;padding:2rem;
+      width:100%;height:100%;
+    }
+
+    /* ── PHONE FRAME ── */
+    .phone {
+      flex-shrink:0;
+      background:#0c0c1e;
+      border:2px solid rgba(255,255,255,.08);
+      border-radius:28px;
+      overflow:hidden;
+      position:relative;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.04),
+        0 28px 55px rgba(0,0,0,.7),
+        0 6px 14px rgba(0,0,0,.4),
+        inset 0 1px 0 rgba(255,255,255,.05);
+      transition:transform .4s ease, box-shadow .4s ease;
+    }
+    .phone-sm { width:115px;height:238px;border-radius:22px; }
+    .phone-md { width:148px;height:308px; }
+    .phone-lg { width:172px;height:358px; }
+    .phone-notch {
+      position:absolute;top:0;left:50%;transform:translateX(-50%);
+      width:52px;height:14px;background:#0c0c1e;
+      border-radius:0 0 9px 9px;z-index:3;
+    }
+    .phone-screen {
+      width:100%;height:100%;
+      background-size:cover;
+      background-position:top center;
+      transition:background-position 9s ease;
+    }
+    .phone:hover .phone-screen { background-position:bottom center; }
+    /* tilt variants for a stacked multi-phone look */
+    .ph-tl { transform:rotate(-9deg) translateY(16px) translateX(-6px); }
+    .ph-tr { transform:rotate(9deg)  translateY(16px) translateX(6px); }
+    .ph-tl:hover,.ph-tr:hover { transform:rotate(0) translateY(0) translateX(0); box-shadow:0 36px 70px rgba(0,0,0,.75); }
+
+    /* ── DOCUMENT / BROWSER FRAME (for case study) ── */
+    .doc-frame {
+      width:265px;height:330px;
+      background:#0c0c1e;
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:12px;overflow:hidden;
+      box-shadow:0 28px 60px rgba(0,0,0,.7);
+      flex-shrink:0;
+    }
+    .doc-bar {
+      height:28px;background:#131330;
+      border-bottom:1px solid rgba(255,255,255,.05);
+      display:flex;align-items:center;padding:0 10px;gap:6px;
+    }
+    .d-r{width:8px;height:8px;border-radius:50%;background:#fd7272;}
+    .d-y{width:8px;height:8px;border-radius:50%;background:#f6c90e;}
+    .d-g{width:8px;height:8px;border-radius:50%;background:#6bcb77;}
+    .doc-screen {
+      width:100%;height:calc(100% - 28px);
+      background-size:cover;background-position:top center;
+      filter:saturate(.75) brightness(.88);
+      transition:background-position 10s ease;
+    }
+    .doc-frame:hover .doc-screen { background-position:bottom center; }
+
+    /* ── TABLET FRAME ── */
+    .tablet-frame {
+      width:210px;height:285px;
+      background:#0c0c1e;
+      border:3px solid rgba(255,255,255,.07);
+      border-radius:14px;overflow:hidden;
+      box-shadow:0 28px 60px rgba(0,0,0,.7);
+      flex-shrink:0;position:relative;
+    }
+    .tablet-screen {
+      width:100%;height:100%;
+      background-size:cover;background-position:top center;
+      filter:saturate(.8) brightness(.9);
+      transition:background-position 9s ease;
+    }
+    .tablet-frame:hover .tablet-screen { background-position:bottom center; }
+
+    /* Bottom label strip over vis */
+    .vis-footer {
+      position:absolute;bottom:0;left:0;right:0;z-index:4;
+      padding:.9rem 1.6rem;
+      background:linear-gradient(to top,rgba(7,7,16,.88),transparent);
+      display:flex;justify-content:space-between;align-items:flex-end;
+    }
+    .vis-lbl {
+      font-family:'Space Grotesk',sans-serif;font-size:.68rem;
+      letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);
+    }
+    .vis-cta {
+      font-size:.7rem;color:var(--accent2);letter-spacing:.08em;
+      opacity:0;transition:opacity .3s;
+    }
+    .case:hover .vis-cta { opacity:1; }
+
+    /* ── PROCESS ── */
+    #process { background:var(--bg2);padding:10rem 4rem; }
+    .process-inner { max-width:960px;margin:0 auto; }
+    .process-grid { margin-top:5rem;display:flex;flex-direction:column;gap:0;position:relative; }
+    .process-grid::before { content:'';position:absolute;left:2.4rem;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--accent),transparent 90%); }
+    .step { display:grid;grid-template-columns:5rem 1fr;gap:2.5rem;padding-bottom:4rem;align-items:start; }
+    .step-num { width:4.8rem;height:4.8rem;border:1px solid var(--border);border-radius:50%;background:var(--bg2);color:var(--accent2);font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;box-shadow:0 0 0 4px var(--bg2); }
+    .step-body { padding-top:.8rem; }
+    .step-body h3 { font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:600;margin-bottom:.6rem; }
+    .step-body p { color:var(--muted);line-height:1.8;font-size:.95rem; }
+
+    /* ── TOOLKIT ── */
+    #callout { padding:10rem 4rem;text-align:center;position:relative;overflow:hidden; }
+    #callout::before { content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(108,92,231,.1) 0%,transparent 70%);pointer-events:none; }
+    .callout-super { font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent2);display:block;margin-bottom:1.5rem; }
+    .callout-title { font-family:'Space Grotesk',sans-serif;font-size:clamp(2.8rem,6vw,5.5rem);font-weight:700;letter-spacing:-.04em;line-height:.98;margin-bottom:2rem; }
+    .callout-title em { color:transparent;-webkit-text-stroke:1px rgba(162,155,254,.45);font-style:normal; }
+    .callout-sub { color:var(--muted);font-size:1.05rem;line-height:1.8;max-width:480px;margin:0 auto 3rem; }
+    .pill-group { display:flex;justify-content:center;flex-wrap:wrap;gap:.75rem; }
+    .pill { border:1px solid var(--border);color:var(--muted);padding:.55rem 1.2rem;border-radius:50px;font-size:.8rem;transition:all .25s; }
+    .pill:hover { border-color:var(--accent2);color:var(--text); }
+
+    /* ── CONTACT ── */
+    #contact { background:var(--bg2);padding:10rem 4rem;text-align:center;position:relative;overflow:hidden; }
+    #contact::before { content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(253,114,114,.07) 0%,transparent 70%);pointer-events:none; }
+    .contact-title { font-family:'Space Grotesk',sans-serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:700;letter-spacing:-.04em;line-height:.98;margin-bottom:1.5rem;position:relative; }
+    .contact-sub { color:var(--muted);font-size:1.05rem;line-height:1.8;max-width:460px;margin:0 auto 2.5rem; }
+    .contact-mail { font-family:'Space Grotesk',sans-serif;font-size:clamp(1.1rem,2.5vw,1.7rem);color:var(--accent2);text-decoration:none;display:block;margin-bottom:3rem;transition:opacity .25s; }
+    .contact-mail:hover { opacity:.65; }
+    .socials { display:flex;justify-content:center;gap:1rem;flex-wrap:wrap; }
+    .soc { border:1px solid var(--border);color:var(--muted);padding:.65rem 1.5rem;border-radius:50px;text-decoration:none;font-size:.82rem;transition:all .25s; }
+    .soc:hover { border-color:var(--accent2);color:var(--text); }
+
+    /* ── FOOTER ── */
+    footer { padding:2rem 5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.78rem; }
+
+    /* ── REVEAL ── */
+    .rv      { opacity:0;transform:translateY(44px); }
+    .rv-left { opacity:0;transform:translateX(-44px); }
+
+    /* ═══════════════════════════════════════════════
+       CASE STUDY VIEWER
+    ═══════════════════════════════════════════════ */
+    #cs-viewer {
+      position:fixed;inset:0;z-index:20000;
+      background:#050510;
+      display:flex;flex-direction:column;
+      opacity:0;pointer-events:none;
+      transform:translateY(28px);
+    }
+    #cs-viewer.open { opacity:1;pointer-events:all;transform:translateY(0); }
+
+    /* top bar */
+    .cs-topbar {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:1.1rem 2.4rem;
+      border-bottom:1px solid var(--border);
+      flex-shrink:0; gap:1rem;
+    }
+    .cs-back-btn {
+      display:flex;align-items:center;gap:.5rem;
+      color:var(--muted);font-size:.8rem;letter-spacing:.06em;
+      background:none;border:none;cursor:none;
+      transition:color .25s;
+    }
+    .cs-back-btn:hover { color:var(--text); }
+    .cs-back-arrow { font-size:1rem; }
+    .cs-project-label {
+      font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:600;
+      flex:1;text-align:center;
+    }
+    .cs-project-label span { color:var(--accent2); }
+    .cs-close-btn {
+      width:2.2rem;height:2.2rem;border-radius:50%;
+      border:1px solid var(--border);background:none;color:var(--text);
+      font-size:1rem;cursor:none;
+      display:flex;align-items:center;justify-content:center;
+      transition:background .25s,border-color .25s;
+    }
+    .cs-close-btn:hover { background:var(--accent);border-color:var(--accent); }
+
+    /* body — split layout */
+    .cs-body {
+      flex:1;display:grid;
+      grid-template-columns:380px 1fr;
+      overflow:hidden;min-height:0;
+    }
+
+    /* left info panel */
+    .cs-info {
+      padding:3rem 3.5rem;
+      display:flex;flex-direction:column;justify-content:center;
+      border-right:1px solid var(--border);
+      overflow:hidden;position:relative;
+    }
+    .cs-info::before {
+      content:'';position:absolute;top:-30%;right:-30%;
+      width:280px;height:280px;
+      background:radial-gradient(circle,var(--glow) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    /* chapter content — animated in/out */
+    .cs-chapter-content { position:relative; }
+    .cs-chapter-num {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;
+      color:var(--accent2);margin-bottom:1.4rem;display:flex;align-items:center;gap:.7rem;
+    }
+    .cs-chapter-num::after {
+      content:'';flex:1;height:1px;background:var(--border);
+    }
+    .cs-chapter-title {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:clamp(1.5rem,2.5vw,2.2rem);font-weight:700;
+      letter-spacing:-.03em;line-height:1.1;margin-bottom:1.2rem;
+    }
+    .cs-chapter-desc {
+      color:var(--muted);line-height:1.85;font-size:.93rem;margin-bottom:1.8rem;
+    }
+    .cs-chapter-tags { display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2.5rem; }
+    .cs-tag {
+      border:1px solid var(--border);color:var(--muted);
+      padding:.28rem .7rem;border-radius:50px;font-size:.72rem;
+    }
+    /* design insight callout */
+    .cs-insight {
+      border-left:2px solid var(--accent2);
+      padding:.9rem 1.2rem;
+      background:rgba(108,92,231,.08);
+      border-radius:0 8px 8px 0;
+    }
+    .cs-insight-label {
+      font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;
+      color:var(--accent2);margin-bottom:.4rem;display:block;
+    }
+    .cs-insight-text { font-size:.85rem;color:var(--muted);line-height:1.6; }
+
+    /* right visual panel */
+    .cs-visual {
+      position:relative;overflow:hidden;background:#02020c;
+    }
+    /* scrollable wrapper — hides the scrollbar, GSAP drives scrollTop */
+    .cs-scroll-wrap {
+      position:absolute;inset:0;
+      overflow-y:scroll;overflow-x:hidden;
+      scrollbar-width:none;
+    }
+    .cs-scroll-wrap::-webkit-scrollbar { display:none; }
+    /* the actual image — full natural height so all content is reachable */
+    .cs-full-img {
+      width:88%;margin:0 auto;display:block;height:auto;
+      position:relative;z-index:1;
+      image-rendering:-webkit-optimize-contrast;
+    }
+    /* fade overlays removed — full image visible */
+    .cs-fade-top, .cs-fade-bottom {
+      display:none;
+      pointer-events:none;
+    }
+    /* ambient glow matching project color */
+    .cs-glow {
+      position:absolute;top:20%;left:50%;transform:translateX(-50%);
+      width:600px;height:600px;border-radius:50%;
+      filter:blur(120px);opacity:.12;pointer-events:none;z-index:0;
+      transition:background .6s;
+    }
+
+    /* chapter label floating on the image */
+    .cs-floating-label {
+      position:absolute;top:1.8rem;left:2rem;z-index:5;
+      background:rgba(5,5,16,.75);backdrop-filter:blur(10px);
+      border:1px solid var(--border);border-radius:8px;
+      padding:.55rem 1rem;
+      font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+      color:rgba(255,255,255,.6);
+    }
+
+    /* footer navigation */
+    .cs-footer {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:1.1rem 2.4rem;
+      border-top:1px solid var(--border);
+      flex-shrink:0;gap:1.5rem;
+    }
+    .cs-nav-btn {
+      display:flex;align-items:center;gap:.5rem;
+      border:1px solid var(--border);background:none;color:var(--muted);
+      padding:.55rem 1.4rem;border-radius:50px;font-size:.82rem;
+      cursor:none;font-family:'Inter',sans-serif;
+      transition:all .25s;min-width:110px;justify-content:center;
+    }
+    .cs-nav-btn:hover:not(:disabled) { border-color:var(--accent2);color:var(--text); }
+    .cs-nav-btn:disabled { opacity:.2;cursor:not-allowed; }
+    /* progress bar + dots */
+    .cs-progress-wrap { flex:1;display:flex;flex-direction:column;align-items:center;gap:.7rem; }
+    .cs-dots { display:flex;gap:.6rem; }
+    .cs-dot {
+      width:6px;height:6px;border-radius:50%;
+      background:rgba(255,255,255,.18);
+      cursor:none;transition:all .3s;
+    }
+    .cs-dot.active { background:var(--accent2);width:22px;border-radius:3px; }
+    .cs-dot:hover:not(.active) { background:rgba(255,255,255,.4); }
+    .cs-prog-track {
+      width:100%;max-width:260px;height:1px;
+      background:rgba(255,255,255,.08);position:relative;overflow:hidden;
+    }
+    .cs-prog-fill {
+      position:absolute;top:0;left:0;height:100%;
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      transition:width .5s cubic-bezier(.76,0,.24,1);
+    }
+    /* no-image fallback */
+    .cs-no-img {
+      position:absolute;inset:0;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:1.2rem;
+      padding:3rem;text-align:center;z-index:3;
+    }
+    .cs-no-img-icon { font-size:3rem;opacity:.15; }
+    .cs-no-img h4 { font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600; }
+    .cs-no-img p { color:var(--muted);font-size:.85rem;line-height:1.7;max-width:380px; }
+    .cs-no-img code {
+      background:rgba(108,92,231,.12);border:1px solid var(--border);
+      padding:.3rem .7rem;border-radius:5px;font-size:.8rem;
+      color:var(--accent2);font-family:monospace;
+    }
+    /* mobile */
+    @media(max-width:700px){
+      .cs-body { grid-template-columns:1fr; }
+      .cs-info  { display:none; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:900px){
+      nav { padding:1.4rem 1.8rem; }
+      .nav-links { display:none; }
+      #about { grid-template-columns:1fr;gap:3.5rem;padding:7rem 1.8rem; }
+      #work { padding:5rem 1.8rem 8rem; }
+      .work-head { flex-direction:column;gap:1rem;align-items:flex-start; }
+      .case { grid-template-columns:1fr;min-height:auto; }
+      .case:nth-child(even) { direction:ltr; }
+      .case-vis { min-height:260px; }
+      #stats { grid-template-columns:repeat(2,1fr); }
+      #process { padding:7rem 1.8rem; }
+      #callout { padding:7rem 1.8rem; }
+      #contact { padding:7rem 1.8rem; }
+      footer { flex-direction:column;gap:.8rem;text-align:center;padding:2rem 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cur-dot"></div>
+  <div id="cur-ring"></div>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="ldr-wm">DST<span>.</span></div>
+    <div class="ldr-track"><div class="ldr-fill"></div></div>
+  </div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <div class="nav-logo">DST<span>.</span></div>
+    <ul class="nav-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+    <a href="#contact" class="nav-pill">Let's Talk →</a>
+  </nav>
+
+  <!-- ══ HERO ══ -->
+  <section id="hero">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-inner">
+      <div class="hero-badge"><span class="badge-dot"></span> Available for new opportunities</div>
+      <h1 class="hero-title">
+        <span class="line"><span class="inner">Designing</span></span>
+        <span class="line"><span class="inner outline">Experiences</span></span>
+        <span class="line"><span class="inner">That Matter.</span></span>
+      </h1>
+      <p class="hero-sub">5+ years shaping digital products where intuition meets aesthetics — turning complexity into seamless, memorable human experiences.</p>
+      <div class="hero-actions">
+        <a href="#work" class="btn-solid">View My Work →</a>
+        <a href="#contact" class="btn-ghost">Start a project ↗</a>
+      </div>
+    </div>
+    <div class="scroll-hint"><span>Scroll</span><div class="scroll-needle"></div></div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span class="marquee-item">UX Research</span><span class="marquee-item">Product Strategy</span><span class="marquee-item">UI Design</span><span class="marquee-item">Design Systems</span><span class="marquee-item">Prototyping</span><span class="marquee-item">User Testing</span><span class="marquee-item">Motion Design</span><span class="marquee-item">Figma</span><span class="marquee-item">SaaS Platforms</span><span class="marquee-item">Mobile Apps</span>
+      <span class="marquee-item">UX Research</span><span class="marquee-item">Product Strategy</span><span class="marquee-item">UI Design</span><span class="marquee-item">Design Systems</span><span class="marquee-item">Prototyping</span><span class="marquee-item">User Testing</span><span class="marquee-item">Motion Design</span><span class="marquee-item">Figma</span><span class="marquee-item">SaaS Platforms</span><span class="marquee-item">Mobile Apps</span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div id="stats">
+    <div class="stat-cell"><span class="stat-num" data-val="5">0</span><span class="stat-lbl">Years Experience</span></div>
+    <div class="stat-cell"><span class="stat-num" data-val="40">0</span><span class="stat-lbl">Projects Delivered</span></div>
+    <div class="stat-cell"><span class="stat-num" data-val="12">0</span><span class="stat-lbl">Happy Clients</span></div>
+    <div class="stat-cell"><span class="stat-num" data-val="3">0</span><span class="stat-lbl">Design Awards</span></div>
+  </div>
+
+  <!-- ══ ABOUT ══ -->
+  <section id="about">
+    <div>
+      <span class="tag rv">About Me</span>
+      <h2 class="h2 rv">I build bridges between users and technology.</h2>
+      <p class="body-copy rv">With 5+ years shaping digital products across HealthTech, EdTech, and e-commerce, I specialize in turning ambiguous challenges into clear, beautiful, and functional solutions — from research all the way to pixel-perfect delivery.</p>
+      <p class="body-copy rv">Whether it's a parental control app, an autism support platform, or an instant grocery experience, I bring a research-first, design-forward mindset — always asking <em>"why"</em> before <em>"how."</em></p>
+    </div>
+    <div class="glass-card rv">
+      <span class="tag">Core Capabilities</span>
+      <div class="tools-grid">
+        <div class="tool-chip">UX Research</div>
+        <div class="tool-chip">Product Strategy</div>
+        <div class="tool-chip">UI Design</div>
+        <div class="tool-chip">Design Systems</div>
+        <div class="tool-chip">Prototyping</div>
+        <div class="tool-chip">User Testing</div>
+        <div class="tool-chip">Figma / FigJam</div>
+        <div class="tool-chip">Motion Design</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ WORK ══ -->
+  <section id="work">
+    <div class="work-head">
+      <div>
+        <span class="tag rv">Selected Work</span>
+        <h2 class="h2 rv">Case Studies</h2>
+      </div>
+      <p class="work-head-note rv">Four projects across HealthTech, EdTech, parental-control &amp; e-commerce — each driven by real user research.</p>
+    </div>
+
+    <div class="cases">
+
+      <!-- ── PROJECT 1: Cognitivebotics ── -->
+      <div class="case rv" data-project="cognitivebotics">
+        <div class="case-info">
+          <div>
+            <div class="case-chips">
+              <span class="chip">HealthTech</span>
+              <span class="chip">EdTech</span>
+              <span class="chip">Product Design</span>
+            </div>
+            <h3 class="case-title">Cognitivebotics — Autism Early Support Platform</h3>
+            <p class="case-desc">Designed a digital application to empower children with autism through early intervention and personalized cognitive journeys. The product combines AI-driven assessments with a warm, accessible interface — making complex therapeutic interactions feel simple and engaging for both children and caregivers.</p>
+            <div class="case-outcome">
+              <div class="outcome-stat"><span class="outcome-num">Early</span><span class="outcome-lbl">Intervention Focus</span></div>
+              <div class="outcome-stat"><span class="outcome-num">AI</span><span class="outcome-lbl">Powered Assessments</span></div>
+            </div>
+          </div>
+          <button class="case-cta" onclick="openLightbox('cognitivebotics','Cognitivebotics — Autism Support Platform')">View Case Study →</button>
+        </div>
+        <div class="case-vis" onclick="openLightbox('cognitivebotics','Cognitivebotics — Autism Support Platform')" style="cursor:none">
+          <!-- rich purple atmosphere -->
+          <div class="vis-atmo" style="background:radial-gradient(ellipse 80% 80% at 45% 50%, rgba(75,25,130,.5) 0%, rgba(7,7,16,.95) 100%)"></div>
+          <div class="mockup-scene">
+            <!-- tablet showing the platform overview -->
+            <div class="tablet-frame" style="transform:rotate(-4deg) translateY(8px);">
+              <div class="tablet-screen" style="background-image:url('project-cognitivebotics.jpg');"></div>
+            </div>
+            <!-- phone showing the app detail -->
+            <div class="phone phone-lg">
+              <div class="phone-notch"></div>
+              <div class="phone-screen" style="background-image:url('project-cognitivebotics.jpg');background-position:60% top;"></div>
+            </div>
+          </div>
+          <div class="vis-footer">
+            <span class="vis-lbl">Cognitivebotics · HealthTech</span>
+            <span class="vis-cta">View case study ↗</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROJECT 2: Ckids UX Research ── -->
+      <div class="case rv" data-project="ckids-research">
+        <div class="case-info">
+          <div>
+            <div class="case-chips">
+              <span class="chip">UX Research</span>
+              <span class="chip">Case Study</span>
+              <span class="chip">Wireframing</span>
+            </div>
+            <h3 class="case-title">Ckids — UX Research &amp; Design Process</h3>
+            <p class="case-desc">End-to-end UX case study documenting the research, discovery, and design strategy behind Ckids. Conducted user interviews, competitive analysis, and created detailed personas — translating findings into wireframes, user flows, and a tested information architecture that shaped every design decision.</p>
+            <div class="case-outcome">
+              <div class="outcome-stat"><span class="outcome-num">15+</span><span class="outcome-lbl">User Interviews</span></div>
+              <div class="outcome-stat"><span class="outcome-num">4</span><span class="outcome-lbl">Design Iterations</span></div>
+            </div>
+          </div>
+          <button class="case-cta" onclick="openLightbox('ckids-research','Ckids — UX Research & Case Study')">View Case Study →</button>
+        </div>
+        <div class="case-vis" onclick="openLightbox('ckids-research','Ckids — UX Research & Case Study')" style="cursor:none">
+          <!-- deep blue atmosphere -->
+          <div class="vis-atmo" style="background:radial-gradient(ellipse 80% 80% at 50% 50%, rgba(20,55,130,.45) 0%, rgba(7,7,16,.95) 100%)"></div>
+          <div class="mockup-scene">
+            <!-- browser / doc frame only — clean single view -->
+            <div class="doc-frame">
+              <div class="doc-bar">
+                <span class="d-r"></span><span class="d-y"></span><span class="d-g"></span>
+              </div>
+              <div class="doc-screen" style="background-image:url('project-ckids-research.jpg');"></div>
+            </div>
+          </div>
+          <div class="vis-footer">
+            <span class="vis-lbl">Ckids · UX Research</span>
+            <span class="vis-cta">View case study ↗</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROJECT 3: ZipCart ── -->
+      <div class="case rv" data-project="zipcart">
+        <div class="case-info">
+          <div>
+            <div class="case-chips">
+              <span class="chip">E-commerce</span>
+              <span class="chip">Mobile App</span>
+              <span class="chip">Visual Design</span>
+            </div>
+            <h3 class="case-title">ZipCart — Instant Grocery Delivery App</h3>
+            <p class="case-desc">Crafted ZipCart, an online grocery app that makes fresh food shopping simple, fast, and enjoyable. Built a complete design system using Lato typography with a fresh, produce-inspired colour palette — delivering an intuitive browse-to-checkout experience that minimises friction at every step.</p>
+            <div class="case-outcome">
+              <div class="outcome-stat"><span class="outcome-num">Full</span><span class="outcome-lbl">Design System</span></div>
+              <div class="outcome-stat"><span class="outcome-num">0-1</span><span class="outcome-lbl">End-to-end</span></div>
+            </div>
+          </div>
+          <button class="case-cta" onclick="openLightbox('zipcart','ZipCart — Grocery Delivery App')">View Full Design →</button>
+        </div>
+        <div class="case-vis" onclick="openLightbox('zipcart','ZipCart — Grocery Delivery App')" style="cursor:none">
+          <!-- fresh teal-green atmosphere -->
+          <div class="vis-atmo" style="background:radial-gradient(ellipse 80% 80% at 55% 50%, rgba(0,110,65,.45) 0%, rgba(7,7,16,.95) 100%)"></div>
+          <div class="mockup-scene">
+            <div class="phone phone-sm ph-tl">
+              <div class="phone-notch"></div>
+              <div class="phone-screen" style="background-image:url('project-zipcart.jpg');background-position:30% top;"></div>
+            </div>
+            <div class="phone phone-lg">
+              <div class="phone-notch"></div>
+              <div class="phone-screen" style="background-image:url('project-zipcart.jpg');background-position:top center;"></div>
+            </div>
+          </div>
+          <div class="vis-footer">
+            <span class="vis-lbl">ZipCart · E-commerce</span>
+            <span class="vis-cta">View full design ↗</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROJECT 4: Ckids Android Screens ── -->
+      <div class="case rv" data-project="ckids-screens">
+        <div class="case-info">
+          <div>
+            <div class="case-chips">
+              <span class="chip">Android App</span>
+              <span class="chip">UI Design</span>
+              <span class="chip">ParentTech</span>
+            </div>
+            <h3 class="case-title">Ckids — Parental Control &amp; Screen Time App</h3>
+            <p class="case-desc">Designed a comprehensive Android parental control app that gives parents real-time visibility and control over their children's digital lives. The app enables profile management, screen time scheduling, content filtering, and activity reporting — all through a calm, approachable interface that reduces parental anxiety.</p>
+            <div class="case-outcome">
+              <div class="outcome-stat"><span class="outcome-num">6</span><span class="outcome-lbl">Core Features</span></div>
+              <div class="outcome-stat"><span class="outcome-num">Android</span><span class="outcome-lbl">Platform</span></div>
+            </div>
+          </div>
+          <button class="case-cta" onclick="openLightbox('ckids-screens','Ckids — Android App Screens')">View Full Design →</button>
+        </div>
+        <div class="case-vis" onclick="openLightbox('ckids-screens','Ckids — Android App Screens')" style="cursor:none">
+          <!-- dark green atmosphere -->
+          <div class="vis-atmo" style="background:radial-gradient(ellipse 80% 80% at 60% 50%, rgba(30,90,45,.45) 0%, rgba(7,7,16,.95) 100%)"></div>
+          <!-- 2 phones -->
+          <div class="mockup-scene">
+            <div class="phone phone-sm ph-tl">
+              <div class="phone-notch"></div>
+              <div class="phone-screen" style="background-image:url('project-ckids-screens.jpg');background-position:20% top;"></div>
+            </div>
+            <div class="phone phone-lg">
+              <div class="phone-notch"></div>
+              <div class="phone-screen" style="background-image:url('project-ckids-screens.jpg');background-position:top center;"></div>
+            </div>
+          </div>
+          <div class="vis-footer">
+            <span class="vis-lbl">Ckids · Android Screens</span>
+            <span class="vis-cta">View full design ↗</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .cases -->
+  </section>
+
+  <!-- ══ PROCESS ══ -->
+  <section id="process">
+    <div class="process-inner">
+      <span class="tag rv">How I Work</span>
+      <h2 class="h2 rv">My Design Process</h2>
+      <div class="process-grid">
+        <div class="step rv-left">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h3>Discover &amp; Define</h3>
+            <p>I start by deeply understanding the problem space — stakeholder interviews, user research, competitive analysis, and data review. No assumptions, only evidence. This is how Ckids began — by sitting with parents and understanding their fears around screen time.</p>
+          </div>
+        </div>
+        <div class="step rv-left">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h3>Ideate &amp; Explore</h3>
+            <p>Translating insights into concepts through rapid sketching, user flows, and information architecture. For Cognitivebotics, I ran co-creation sessions with therapists and caregivers to ensure the mental model matched the real world.</p>
+          </div>
+        </div>
+        <div class="step rv-left">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h3>Design &amp; Prototype</h3>
+            <p>High-fidelity interfaces built with systems thinking — consistent components, accessible patterns, and micro-interactions that delight without distraction. ZipCart's full design system was built component-first before any screen was composed.</p>
+          </div>
+        </div>
+        <div class="step rv-left">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h3>Test &amp; Iterate</h3>
+            <p>Usability testing with real users, synthesizing feedback, and refining. Great design is never finished — it evolves with the people who use it. Ckids went through 4 major UX iterations based on parent feedback before reaching its final form.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ TOOLKIT ══ -->
+  <section id="callout">
+    <span class="callout-super rv">The Toolkit</span>
+    <h2 class="callout-title rv">Crafting with the<br><em>best tools</em> in the craft.</h2>
+    <p class="callout-sub rv">Every pixel purposeful. Every flow intentional. Built on a foundation of industry-leading design tools.</p>
+    <div class="pill-group rv">
+      <span class="pill">Figma</span><span class="pill">FigJam</span><span class="pill">Protopie</span>
+      <span class="pill">Principle</span><span class="pill">Maze</span><span class="pill">Miro</span>
+      <span class="pill">Framer</span><span class="pill">Notion</span><span class="pill">Zeroheight</span><span class="pill">Lottie</span>
+    </div>
+  </section>
+
+  <!-- ══ CONTACT ══ -->
+  <section id="contact">
+    <span class="callout-super rv">Get In Touch</span>
+    <h2 class="contact-title rv">Let's create<br>something great.</h2>
+    <p class="contact-sub rv">Open to full-time roles, contract work, and creative collaborations with ambitious teams and startups.</p>
+    <a href="mailto:durgasaitejachilukuri@gmail.com" class="contact-mail rv">durgasaitejachilukuri@gmail.com</a>
+    <div class="socials rv">
+      <a href="#" class="soc">LinkedIn ↗</a>
+      <a href="#" class="soc">Dribbble ↗</a>
+      <a href="#" class="soc">Behance ↗</a>
+      <a href="#" class="soc">Resume ↗</a>
+    </div>
+  </section>
+
+  <footer>
+    <div>© 2024 DST. · All rights reserved.</div>
+    <div>UX/UI &amp; Product Designer · 5+ Years</div>
+  </footer>
+
+  <!-- ══ CASE STUDY VIEWER ══ -->
+  <div id="cs-viewer">
+
+    <!-- top bar -->
+    <div class="cs-topbar">
+      <button class="cs-back-btn" onclick="closeViewer()">
+        <span class="cs-back-arrow">←</span> Back to Portfolio
+      </button>
+      <div class="cs-project-label" id="cs-project-label">Project <span>Case Study</span></div>
+      <button class="cs-close-btn" onclick="closeViewer()">✕</button>
+    </div>
+
+    <!-- body: info panel + visual panel -->
+    <div class="cs-body">
+
+      <!-- LEFT: chapter info -->
+      <div class="cs-info">
+        <div class="cs-chapter-content" id="cs-chapter-content">
+          <div class="cs-chapter-num" id="cs-ch-num">01 / 04</div>
+          <h2 class="cs-chapter-title" id="cs-ch-title">Chapter Title</h2>
+          <p class="cs-chapter-desc" id="cs-ch-desc">Description goes here.</p>
+          <div class="cs-chapter-tags" id="cs-ch-tags"></div>
+          <div class="cs-insight">
+            <span class="cs-insight-label">Design Insight</span>
+            <p class="cs-insight-text" id="cs-ch-insight">Insight text.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: image visual -->
+      <div class="cs-visual">
+        <div class="cs-glow" id="cs-glow"></div>
+        <!-- scrollable full-image container -->
+        <div class="cs-scroll-wrap" id="cs-scroll-wrap">
+          <img class="cs-full-img" id="cs-full-img" src="" alt="Case Study" style="padding:2rem 0;" />
+        </div>
+        <!-- overlay fades -->
+        <div class="cs-fade-top"></div>
+        <div class="cs-fade-bottom"></div>
+        <!-- floating chapter label -->
+        <div class="cs-floating-label" id="cs-floating-label">Overview</div>
+        <!-- no-image fallback -->
+        <div class="cs-no-img" id="cs-no-img" style="display:none">
+          <div class="cs-no-img-icon">🖼</div>
+          <h4>Image Not Found</h4>
+          <p>Save your image file as:<br><code id="cs-no-img-filename"></code><br>
+          in the same folder as <code>portfolio.html</code>, then refresh.</p>
+        </div>
+      </div>
+
+    </div><!-- .cs-body -->
+
+    <!-- footer navigation -->
+    <div class="cs-footer">
+      <button class="cs-nav-btn" id="cs-prev-btn" onclick="csNavigate(-1)">← Prev</button>
+      <div class="cs-progress-wrap">
+        <div class="cs-dots" id="cs-dots"></div>
+        <div class="cs-prog-track"><div class="cs-prog-fill" id="cs-prog-fill"></div></div>
+      </div>
+      <button class="cs-nav-btn" id="cs-next-btn" onclick="csNavigate(1)">Next →</button>
+    </div>
+
+  </div><!-- #cs-viewer -->
+
+  <!-- ══════════════════════ JAVASCRIPT ══════════════════════ -->
+  <script>
+  /* ─── THREE.JS HERO ─────────────────────────── */
+  (function(){
+    const canvas=document.getElementById('hero-canvas');
+    const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.setSize(innerWidth,innerHeight);
+    const scene=new THREE.Scene();
+    const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,0.1,100);
+    camera.position.z=4;
+    const COUNT=2200,pos=new Float32Array(COUNT*3);
+    for(let i=0;i<COUNT;i++){pos[i*3]=(Math.random()-.5)*12;pos[i*3+1]=(Math.random()-.5)*12;pos[i*3+2]=(Math.random()-.5)*6;}
+    const pGeo=new THREE.BufferGeometry();
+    pGeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    const pts=new THREE.Points(pGeo,new THREE.PointsMaterial({color:0x6c5ce7,size:.018,transparent:true,opacity:.55,sizeAttenuation:true}));
+    scene.add(pts);
+    const pos2=new Float32Array(800*3);
+    for(let i=0;i<800;i++){pos2[i*3]=(Math.random()-.5)*10;pos2[i*3+1]=(Math.random()-.5)*10;pos2[i*3+2]=(Math.random()-.5)*4;}
+    const pGeo2=new THREE.BufferGeometry();
+    pGeo2.setAttribute('position',new THREE.BufferAttribute(pos2,3));
+    const pts2=new THREE.Points(pGeo2,new THREE.PointsMaterial({color:0xa29bfe,size:.012,transparent:true,opacity:.4,sizeAttenuation:true}));
+    scene.add(pts2);
+    const shapeData=[];
+    const geos=[new THREE.IcosahedronGeometry(.35,0),new THREE.OctahedronGeometry(.28,0),new THREE.TetrahedronGeometry(.28,0),new THREE.IcosahedronGeometry(.22,1)];
+    const colors=[0x6c5ce7,0xa29bfe,0xfd7272,0x6c5ce7];
+    for(let i=0;i<7;i++){
+      const mat=new THREE.MeshBasicMaterial({color:colors[i%colors.length],wireframe:true,transparent:true,opacity:.18});
+      const mesh=new THREE.Mesh(geos[i%geos.length],mat);
+      mesh.position.set((Math.random()-.5)*8,(Math.random()-.5)*5,(Math.random()-.5)*3-1);
+      mesh.rotation.set(Math.random()*Math.PI*2,Math.random()*Math.PI*2,0);
+      shapeData.push({mesh,rx:(Math.random()-.5)*.008,ry:(Math.random()-.5)*.008,fs:Math.random()*.004+.001,fo:Math.random()*Math.PI*2});
+      scene.add(mesh);
+    }
+    let mx=0,my=0;
+    document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*.6;my=(e.clientY/innerHeight-.5)*.6;});
+    window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+    let t=0;
+    (function animate(){requestAnimationFrame(animate);t+=.004;
+      pts.rotation.y=t*.04;pts2.rotation.y=-t*.03;pts.rotation.x=my*.25;
+      camera.position.x+=(mx-camera.position.x)*.04;camera.position.y+=(-my-camera.position.y)*.04;
+      shapeData.forEach(({mesh,rx,ry,fs,fo})=>{mesh.rotation.x+=rx;mesh.rotation.y+=ry;mesh.position.y+=Math.sin(t*fs*25+fo)*.0015;});
+      renderer.render(scene,camera);
+    })();
+  })();
+
+  /* ─── GSAP ───────────────────────────────────── */
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* cursor */
+  const dot=document.getElementById('cur-dot'),ring=document.getElementById('cur-ring');
+  let rx=0,ry=0,fx=0,fy=0;
+  document.addEventListener('mousemove',e=>{rx=e.clientX;ry=e.clientY;gsap.to(dot,{x:rx-5,y:ry-5,duration:.08});});
+  (function followRing(){fx+=(rx-fx-18)*.1;fy+=(ry-fy-18)*.1;gsap.set(ring,{x:fx,y:fy});requestAnimationFrame(followRing);})();
+  document.querySelectorAll('a,button,.case,.tool-chip,.pill,.soc').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{document.body.classList.add('cur-grow');gsap.to(dot,{scale:2,duration:.25});});
+    el.addEventListener('mouseleave',()=>{document.body.classList.remove('cur-grow');gsap.to(dot,{scale:1,duration:.25});});
+  });
+
+  /* loader */
+  gsap.set('nav',{opacity:0});
+  window.addEventListener('load',()=>{
+    gsap.to('#loader',{opacity:0,duration:.7,delay:2,ease:'power2.inOut',onComplete(){
+      document.getElementById('loader').style.display='none';
+      const tl=gsap.timeline();
+      tl.to('nav',{opacity:1,duration:.8,ease:'power2.out'})
+        .to('.hero-badge',{opacity:1,y:0,duration:.7,ease:'power3.out'},'-=.4')
+        .to('.hero-title .inner',{y:'0%',duration:1,stagger:.14,ease:'power4.out'},'-=.4')
+        .to('.hero-sub',{opacity:1,duration:.8,ease:'power2.out'},'-=.5')
+        .to('.hero-actions',{opacity:1,duration:.8,ease:'power2.out'},'-=.5')
+        .to('.scroll-hint',{opacity:1,duration:.8,ease:'power2.out'},'-=.3');
+    }});
+  });
+
+  /* hero parallax */
+  gsap.to('.hero-inner',{y:130,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
+
+  /* scroll reveals */
+  gsap.utils.toArray('.rv').forEach(el=>{
+    gsap.fromTo(el,{opacity:0,y:50},{opacity:1,y:0,duration:.9,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none none'}});
+  });
+  gsap.utils.toArray('.rv-left').forEach(el=>{
+    gsap.fromTo(el,{opacity:0,x:-50},{opacity:1,x:0,duration:.9,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none none'}});
+  });
+
+  /* stats counter */
+  document.querySelectorAll('.stat-num').forEach(el=>{
+    const target=+el.dataset.val;
+    ScrollTrigger.create({trigger:el,start:'top 88%',onEnter(){
+      gsap.to({n:0},{n:target,duration:1.6,ease:'power2.out',onUpdate(){el.textContent=Math.round(this.targets()[0].n)+'+';} });
+    }});
+  });
+
+  /* case tilt */
+  document.querySelectorAll('.case').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const xP=((e.clientX-r.left)/r.width-.5)*5;
+      const yP=((e.clientY-r.top)/r.height-.5)*5;
+      gsap.to(card,{rotateX:-yP,rotateY:xP,duration:.4,ease:'power2.out',transformPerspective:900});
+    });
+    card.addEventListener('mouseleave',()=>gsap.to(card,{rotateX:0,rotateY:0,duration:.6,ease:'power3.out'}));
+  });
+
+  /* callout / contact scale */
+  ['#callout .callout-title','#contact .contact-title'].forEach(sel=>{
+    gsap.fromTo(sel,{scale:.85,opacity:0},{scale:1,opacity:1,duration:1,ease:'power3.out',scrollTrigger:{trigger:sel,start:'top 72%'}});
+  });
+
+  /* ─── CASE STUDY VIEWER ─────────────────────── */
+
+  /* imgY = % of the image's scrollable height to jump to (0% = top, 100% = bottom) */
+  const CS_DATA = {
+
+    'ckids-screens': {
+      label:'Ckids', sublabel:'Parental Control App',
+      image:'project-ckids-screens.jpg', accent:'#3d8b37',
+      chapters:[
+        { label:'Brand Overview',
+          title:'Brand & Identity',
+          desc:'Established the visual language for Ckids — a nature-inspired palette of forest greens, corals and clean whites that communicates safety and parental trust without feeling clinical. Every colour choice was mapped to an emotional response parents needed to feel.',
+          tags:['Branding','Color System','Typography'],
+          insight:'Green was chosen deliberately — it subconsciously signals safety and balance to parents anxious about digital exposure. The coral accent adds urgency for alert states without triggering alarm.',
+          imgY:'0%' },
+        { label:'Profile Setup',
+          title:'Profile Management',
+          desc:'Designed the child profile creation flow — one of the most critical onboarding moments. Parents set up each child\'s age, device, and initial limits here. The flow uses progressive disclosure so it never overwhelms despite collecting significant configuration data.',
+          tags:['Onboarding UX','Profile Creation','Android'],
+          insight:'Testing revealed parents abandoned setup when asked for too much upfront. We moved 60% of settings to a "customise later" flow — completion rate jumped from 44% to 81%.',
+          imgY:'18%' },
+        { label:'Screen Time Controls',
+          title:'Screen Time & Dashboard',
+          desc:'The primary parent dashboard showing real-time screen time usage, active apps, and daily limits at a glance. Every metric is prioritised by urgency. The one-tap "Pause All" button — the #1 requested feature — is the most prominent element on the screen.',
+          tags:['Dashboard UX','Information Hierarchy','Real-time Data'],
+          insight:'The dashboard was redesigned 3 times. The final version surfaces the 3 most-needed controls without any navigation — parents can act in under 2 seconds from opening the app.',
+          imgY:'35%' },
+        { label:'App Filtering',
+          title:'App-Level Controls & Filtering',
+          desc:'Per-app controls allowing parents to block, time-limit, or age-gate specific applications. The interface groups apps by category automatically and uses colour-coded risk indicators based on app content ratings — so parents don\'t need to evaluate each app manually.',
+          tags:['Feature Design','Progressive Disclosure','Content Safety'],
+          insight:'Category-level controls were added after parents said reviewing individual apps felt like homework. 78% of parents in testing used category controls over individual app controls.',
+          imgY:'52%' },
+        { label:"Kid's Device Mode",
+          title:"Kid's Device & Safe Mode",
+          desc:'A separate UI mode designed for the child\'s perspective — a locked-down launcher with only approved apps visible. Used larger tap targets (56dp+), simplified iconography, and warmer colours. Children experience it as their own space, not a restriction.',
+          tags:["Kids UX",'Launcher Design','Accessibility'],
+          insight:'Designing for two audiences in one product — controlling parent and restricted child — required entirely different mental models. The child-facing UI has zero overlap with the parent UI intentionally.',
+          imgY:'68%' },
+        { label:'Reports & Notifications',
+          title:'Activity Reports & Alerts',
+          desc:'Weekly activity digests, real-time alert notifications, and usage trend charts. Designed to reduce the cognitive load of monitoring — parents get the signal without the noise. Push notifications use a tiered urgency system with distinct visual and tonal styles.',
+          tags:['Data Visualisation','Push Notifications','Reporting'],
+          insight:'Parents wanted "just tell me if something is wrong" — not a data dashboard. The report was redesigned as a narrative summary ("Zara had a calm week") rather than raw numbers.',
+          imgY:'88%' }
+      ]
+    },
+
+    'ckids-research': {
+      label:'Ckids', sublabel:'UX Research & Case Study',
+      image:'project-ckids-research.jpg', accent:'#2563eb',
+      chapters:[
+        { label:'Research Brief',
+          title:'Problem Space & Brief',
+          desc:'Defined the research brief: parents increasingly struggle to set healthy digital boundaries, yet existing parental-control tools are either too complex or too blunt. The objective was to understand the emotional drivers behind screen-time anxiety — not just the functional needs.',
+          tags:['Problem Definition','Research Planning','Stakeholder Alignment'],
+          insight:'The brief was intentionally kept broad at this stage. Narrowing too early would have missed the real pain point — parental guilt — and delivered a tool that solved the wrong problem.',
+          imgY:'0%' },
+        { label:'User Research',
+          title:'User Interviews & Surveys',
+          desc:'Conducted 15+ semi-structured parent interviews and deployed a survey to 60 respondents across age groups and household types. Key finding: 74% of parents felt guilty enforcing screen limits, and 68% had abandoned a parental control app within 2 weeks of installing it.',
+          tags:['User Interviews','Survey Data','Qualitative Research'],
+          insight:'The most repeated phrase across interviews was "I feel like the bad guy." The product needed to shift parents from being enforcers to being coaches — a complete frame change.',
+          imgY:'18%' },
+        { label:'Data Analysis',
+          title:'Insights & Affinity Mapping',
+          desc:'Synthesised interview transcripts and survey data into affinity clusters. Three primary themes emerged: Guilt & Conflict, Visibility & Awareness, and Trust & Transparency. These became the three design pillars that shaped every subsequent decision.',
+          tags:['Affinity Mapping','Insight Synthesis','Design Pillars'],
+          insight:'The data revealed that the real product wasn\'t a control tool — it was a guilt-reduction tool. That single reframe changed the entire design direction, tone of voice, and feature priority.',
+          imgY:'34%' },
+        { label:'Personas',
+          title:'User Personas & Journey Maps',
+          desc:'Created two primary personas — The Anxious Monitor (reactive, checking constantly) and The Structured Planner (proactive, sets rules in advance) — and mapped their contrasting emotional journeys through the product. Both needed to feel respected, not judged.',
+          tags:['Personas','Journey Mapping','Empathy'],
+          insight:'Journey mapping revealed a key moment of tension: the "screen time limit reached" notification. How this moment was designed determined whether the product felt fair or punitive.',
+          imgY:'50%' },
+        { label:'Wireframes',
+          title:'Wireframes & Flow Testing',
+          desc:'Translated research findings into low-fidelity wireframes and user flow diagrams. Tested 3 navigation patterns — tab bar, bottom drawer, and side navigation — with 6 parents. The tab-bar model won decisively, with the highest task completion and lowest error rate.',
+          tags:['Wireframing','User Flow Diagrams','Navigation Testing'],
+          insight:'The "obvious" navigation pattern from the brief was rejected by 5 out of 6 testers. The wireframe testing phase alone saved an estimated 3 weeks of post-build rework.',
+          imgY:'68%' },
+        { label:'Final Solution',
+          title:'Validation & Final Designs',
+          desc:'High-fidelity designs validated through 2 full rounds of moderated usability testing. Task completion improved from 61% (V1) to 89% (V3). Time-to-block-an-app reduced from 4 taps to a single swipe. SUS score: 78/100 — well above the industry average of 68.',
+          tags:['High Fidelity','Usability Testing','SUS Score'],
+          insight:'The "panic button" — one-tap pause-all — was only added in V2 after watching a parent struggle to quickly restrict access during a live testing session. It became the product\'s signature feature.',
+          imgY:'88%' }
+      ]
+    },
+
+    'cognitivebotics': {
+      label:'Cognitivebotics', sublabel:'Autism Early Support Platform',
+      image:'project-cognitivebotics.jpg', accent:'#7c3aed',
+      chapters:[
+        { label:'Product Vision',
+          title:'What is Cognitivebotics?',
+          desc:'Cognitivebotics bridges the gap between clinical autism therapy and everyday family life. The platform empowers children with autism through personalised AI-driven cognitive exercises, giving caregivers real-time progress visibility without requiring clinical expertise to interpret.',
+          tags:['HealthTech','EdTech','Product Strategy'],
+          insight:'The core design principle established on day one: every interaction must feel like play to the child and like progress to the parent. These two goals cannot compromise each other — the design had to serve both simultaneously.',
+          imgY:'0%' },
+        { label:'Platform Goals',
+          title:'Research & Platform Strategy',
+          desc:'Conducted research with parents, occupational therapists, and special-education specialists to understand the gaps in at-home autism support. Key finding: caregivers felt isolated between clinical appointments and lacked tools to continue therapeutic activities at home.',
+          tags:['Research','Clinical Partnerships','Strategy'],
+          insight:'OTs consistently said: "Parents forget the exercises by the time they get home." The product needed to be a memory extension for therapy, not a new therapy system.',
+          imgY:'16%' },
+        { label:'Key Features',
+          title:'Feature Design & Validation',
+          desc:'Designed the assessment engine, daily activity flows, and caregiver dashboard — each feature validated with occupational therapists before high-fidelity work began. The activity library was co-designed with 3 OTs over 6 weeks to ensure clinical alignment.',
+          tags:['Feature Design','Clinical Co-Design','Validation'],
+          insight:'40% of initially-planned features were removed after therapist sessions revealed that variety overwhelmed children with autism. Simplicity became a therapeutic requirement, not a design preference.',
+          imgY:'32%' },
+        { label:'Pricing & Tiers',
+          title:'Business Model & Tiers',
+          desc:'Designed the subscription tiers and pricing page — a critical trust moment in a healthcare product. The interface needed to communicate value without exploiting parental anxiety. Copy was extensively tested to ensure it felt empowering, not fear-based.',
+          tags:['Pricing UX','Conversion Design','Trust Signals'],
+          insight:'Healthcare pricing design requires extreme care — we A/B tested 4 copy variants. The winner emphasised progress milestones over feature lists, increasing trial sign-ups by 34%.',
+          imgY:'48%' },
+        { label:'Design System',
+          title:'Accessible Design System',
+          desc:'Built a bespoke design system optimised for neurodiverse users: WCAG AA+ contrast ratios, predictable interaction patterns, zero sudden motion, and a warm palette that avoids both clinical sterility and sensory overwhelm. Every component has a reduced-motion variant.',
+          tags:['Design System','WCAG AA+','Accessibility'],
+          insight:'Colour selection was a 3-week process with an autism specialist. Pure saturated primaries were eliminated entirely — all palette colours are slightly desaturated to reduce sensory intensity.',
+          imgY:'64%' },
+        { label:'Final Product',
+          title:'Final Screens & Impact',
+          desc:'The complete platform spanning onboarding, daily cognitive exercises, progress tracking, and caregiver reports. Pilot tested with 12 families over 8 weeks. Caregivers reported a 68% improvement in their confidence tracking developmental milestones at home.',
+          tags:['Final Designs','Pilot Testing','Impact Metrics'],
+          insight:'The metric we tracked wasn\'t "time in app" — it was caregiver anxiety reduction on a validated clinical scale. 68% improvement. The design succeeded not by being engaging, but by being reassuring.',
+          imgY:'84%' }
+      ]
+    },
+
+    'zipcart': {
+      label:'ZipCart', sublabel:'Instant Grocery Delivery App',
+      image:'project-zipcart.jpg', accent:'#16a34a',
+      chapters:[
+        { label:'Brand Identity',
+          title:'Brand & Typography System',
+          desc:'Established ZipCart\'s visual identity around freshness and speed. Lato was chosen for its geometric clarity and legibility at small sizes — critical for dense product listings. The colour system draws from produce itself: crisp greens, warm amber, and clean whites.',
+          tags:['Brand Identity','Typography','Design Language'],
+          insight:'The green system is a 5-step tonal scale, not a single colour. Lighter tints create breathing room in dense listings; full-saturation green is reserved exclusively for CTAs to protect conversion value.',
+          imgY:'0%' },
+        { label:'Color & Icons',
+          title:'Colour Palette & Icon System',
+          desc:'Defined the full colour palette and a custom icon library of 60+ icons using a consistent 1.5px stroke weight. Thinner than most grocery apps — a deliberate choice to feel premium without sacrificing legibility on budget Android devices at small viewport sizes.',
+          tags:['Color System','Icon Design','Visual Consistency'],
+          insight:'The icon stroke weight was set at 1.5px after testing on a Samsung Galaxy A-series device — the lowest-spec device in the target market. 2px icons looked too bold; 1px too fragile. 1.5px hit the sweet spot.',
+          imgY:'16%' },
+        { label:'Launch Screens',
+          title:'Launch Screens & Visual Design',
+          desc:'Designed the onboarding and launch experience — the first impression of the brand. The hero imagery uses a "floating produce" photography style: high-key lighting, slight overexposure, and top-lit angles that make fresh produce look vibrant and premium.',
+          tags:['Onboarding','Visual Design','Photography Direction'],
+          insight:'Food photography direction was a UX decision, not just aesthetic. Overexposed, top-lit produce images were proven in studies to increase perceived freshness and purchase intent versus standard product-on-white.',
+          imgY:'30%' },
+        { label:'Core Shopping',
+          title:'Browse & Category Architecture',
+          desc:'The category-first browse architecture came directly from research: 73% of sessions start with category browsing, not search — the opposite of what the client had assumed. Redesigned the IA to front-load categories and demote the search bar from primary navigation.',
+          tags:['Information Architecture','Category UX','Research-led Design'],
+          insight:'The client\'s brief specified "search-first." Research data overruled it. The category-first architecture increased add-to-cart rate by 28% versus the original search-first prototype in usability testing.',
+          imgY:'46%' },
+        { label:'Product & Cart',
+          title:'Product Detail & Cart Design',
+          desc:'Product pages balance rich imagery with fast-scannable information architecture. The "Add to Cart" button is 56dp — larger than the 48dp industry standard. Cart interactions use micro-animations that confirm each addition without interrupting the browse flow.',
+          tags:['Product UX','Cart Design','Micro-interactions'],
+          insight:'The 56dp add-to-cart button came from watching users miss the 48dp target repeatedly in one-handed use testing. A single 8dp increase improved single-hand add-to-cart success rate by 22%.',
+          imgY:'62%' },
+        { label:'Checkout & Explore',
+          title:'Checkout Flow & Full Screens',
+          desc:'The full explore screens, checkout flow compressed from 5 steps to 3, and order tracking. Address and delivery time-slot were merged onto a single map-based screen — the biggest friction point in competing apps. Cart abandonment dropped 31% in prototype testing.',
+          tags:['Checkout Design','Order Tracking','End-to-end Flow'],
+          insight:'The map-based time-slot picker was the single highest-rated interaction in all testing sessions. Seeing your delivery window on a live map reduced "will it actually arrive?" anxiety — a key abandonment driver.',
+          imgY:'84%' }
+      ]
+    }
+  };
+
+  /* ── viewer state ── */
+  let csKey            = null;
+  let csIndex          = 0;
+  let csScrolling      = false;   /* true while GSAP is animating scrollTop */
+  let csScrollListener = null;    /* reference so we can remove it on re-open */
+
+  function openLightbox(key){ openViewer(key); }   /* keep old inline calls working */
+
+  function openViewer(key) {
+    csKey   = key;
+    csIndex = 0;
+    const data = CS_DATA[key];
+    if(!data) return;
+
+    const viewer = document.getElementById('cs-viewer');
+
+    /* project label */
+    document.getElementById('cs-project-label').innerHTML =
+      `${data.label} <span>/ ${data.sublabel}</span>`;
+
+    /* build footer nav dots (single source of chapter navigation) */
+    const dotsEl = document.getElementById('cs-dots');
+    dotsEl.innerHTML = '';
+    data.chapters.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'cs-dot' + (i===0?' active':'');
+      d.onclick = () => goToChapter(i);
+      dotsEl.appendChild(d);
+    });
+
+    /* ── scroll-to-chapter auto sync ── */
+    const wrapEl = document.getElementById('cs-scroll-wrap');
+    /* remove any listener from a previous openViewer call */
+    if(csScrollListener) wrapEl.removeEventListener('scroll', csScrollListener);
+
+    let scrollDebounce = null;
+    csScrollListener = () => {
+      /* while GSAP is driving scrollTop, ignore manual scroll events */
+      if(csScrolling) return;
+      clearTimeout(scrollDebounce);
+      scrollDebounce = setTimeout(() => {
+        const d = CS_DATA[csKey];
+        if(!d) return;
+        /* find the chapter whose target scrollTop is closest to current position */
+        let closest = 0, minDist = Infinity;
+        d.chapters.forEach((_, i) => {
+          const dist = Math.abs(wrapEl.scrollTop - getScrollTarget(i));
+          if(dist < minDist) { minDist = dist; closest = i; }
+        });
+        if(closest !== csIndex) renderChapter(closest, false);
+      }, 60); /* 60 ms debounce — smooth but responsive */
+    };
+    wrapEl.addEventListener('scroll', csScrollListener, { passive: true });
+
+    /* project accent glow */
+    document.getElementById('cs-glow').style.background = data.accent;
+
+    /* load image */
+    const imgEl  = document.getElementById('cs-full-img');
+    const noImg  = document.getElementById('cs-no-img');
+    const wrap   = document.getElementById('cs-scroll-wrap');
+
+    imgEl.style.opacity = '0';
+    noImg.style.display = 'none';
+
+    const testImg = new Image();
+    testImg.onload = () => {
+      imgEl.src = data.image;
+      imgEl.style.opacity = '1';
+      noImg.style.display = 'none';
+      /* after image loads, jump to chapter 0 without animation */
+      setTimeout(() => renderChapter(0, false), 80);
+    };
+    testImg.onerror = () => {
+      imgEl.src = '';
+      document.getElementById('cs-no-img-filename').textContent = data.image;
+      noImg.style.display = 'flex';
+      renderChapter(0, false);
+    };
+    testImg.src = data.image + '?t=' + Date.now();
+
+    /* open viewer */
+    document.body.style.overflow = 'hidden';
+    wrap.scrollTop = 0;
+    viewer.classList.add('open');
+    gsap.fromTo(viewer,
+      { opacity:0, y:32 },
+      { opacity:1, y:0, duration:.5, ease:'power3.out' }
+    );
+
+    renderChapter(0, false);
+  }
+
+  function getScrollTarget(idx) {
+    /* Convert imgY percentage to an actual scrollTop pixel value */
+    const wrap  = document.getElementById('cs-scroll-wrap');
+    const img   = document.getElementById('cs-full-img');
+    const ch    = CS_DATA[csKey].chapters[idx];
+    const pct   = parseFloat(ch.imgY) / 100;
+    /* scrollable height = total img height + padding - viewport height */
+    const maxScroll = Math.max(0, img.offsetHeight + 64 - wrap.offsetHeight);
+    return pct * maxScroll;
+  }
+
+  function renderChapter(idx, animate) {
+    const data = CS_DATA[csKey];
+    const ch   = data.chapters[idx];
+    const wrap = document.getElementById('cs-scroll-wrap');
+
+    /* ── scroll the image panel ── */
+    const target = getScrollTarget(idx);
+    if(animate) {
+      csScrolling = true;
+      gsap.to(wrap, { scrollTop: target, duration: 1, ease:'power3.inOut',
+        onComplete() { csScrolling = false; } });
+    } else {
+      wrap.scrollTop = target;
+    }
+
+    /* ── floating chapter label ── */
+    const fl = document.getElementById('cs-floating-label');
+    if(animate) {
+      gsap.to(fl, { opacity:0, y:-6, duration:.15, onComplete() {
+        fl.textContent = ch.label;
+        gsap.to(fl, { opacity:1, y:0, duration:.25 });
+      }});
+    } else {
+      fl.textContent = ch.label;
+    }
+
+    /* ── footer dots ── */
+    document.querySelectorAll('.cs-dot').forEach((d,i) =>
+      d.classList.toggle('active', i===idx));
+
+    /* ── progress bar ── */
+    document.getElementById('cs-prog-fill').style.width =
+      ((idx+1) / data.chapters.length * 100) + '%';
+
+    /* ── nav buttons ── */
+    document.getElementById('cs-prev-btn').disabled = idx === 0;
+    document.getElementById('cs-next-btn').disabled = idx === data.chapters.length - 1;
+
+    /* ── left panel text ── */
+    const cc = document.getElementById('cs-chapter-content');
+    const doRender = () => {
+      document.getElementById('cs-ch-num').textContent =
+        String(idx+1).padStart(2,'0') + ' / ' + String(data.chapters.length).padStart(2,'0');
+      document.getElementById('cs-ch-title').textContent   = ch.title;
+      document.getElementById('cs-ch-desc').textContent    = ch.desc;
+      document.getElementById('cs-ch-insight').textContent = ch.insight;
+      document.getElementById('cs-ch-tags').innerHTML =
+        ch.tags.map(t=>`<span class="cs-tag">${t}</span>`).join('');
+    };
+
+    if(animate) {
+      gsap.to(cc, { opacity:0, x:-18, duration:.18, ease:'power2.in',
+        onComplete() {
+          doRender();
+          gsap.fromTo(cc, {opacity:0,x:18}, {opacity:1,x:0,duration:.38,ease:'power3.out'});
+        }
+      });
+    } else {
+      doRender();
+      gsap.set(cc, {opacity:1, x:0});
+    }
+
+    csIndex = idx;
+  }
+
+  function csNavigate(dir) {
+    const next = csIndex + dir;
+    const len  = CS_DATA[csKey].chapters.length;
+    if(next < 0 || next >= len) return;
+    renderChapter(next, true);
+  }
+
+  function goToChapter(idx) { renderChapter(idx, true); }
+
+  function closeViewer() {
+    const viewer = document.getElementById('cs-viewer');
+    gsap.to(viewer, { opacity:0, y:20, duration:.32, ease:'power2.in',
+      onComplete() {
+        viewer.classList.remove('open');
+        document.body.style.overflow = '';
+        csKey = null;
+      }
+    });
+  }
+
+  /* keyboard */
+  document.addEventListener('keydown', e => {
+    if(!document.getElementById('cs-viewer').classList.contains('open')) return;
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') csNavigate(1);
+    if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   csNavigate(-1);
+    if(e.key==='Escape') closeViewer();
+  });
+
+  /* swipe */
+  (function(){
+    let sx=0;
+    const v=document.getElementById('cs-viewer');
+    v.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
+    v.addEventListener('touchend',e=>{
+      const dx=e.changedTouches[0].clientX-sx;
+      if(Math.abs(dx)>55) csNavigate(dx<0?1:-1);
+    });
+  })();
+  </script>
+</body>
+</html>
