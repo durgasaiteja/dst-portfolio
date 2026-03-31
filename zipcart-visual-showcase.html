@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZipCart — Visual Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0B0B0F;
+      --bg-2:       #111118;
+      --bg-card:    #15151E;
+      --bg-card-2:  #1A1A25;
+      --border:     #22222E;
+      --border-2:   #2E2E3E;
+      --accent:     #84CC16;
+      --accent-dim: rgba(132,204,22,0.10);
+      --accent-mid: rgba(132,204,22,0.28);
+      --blue:       #38BDF8;
+      --blue-dim:   rgba(56,189,248,0.10);
+      --violet:     #A78BFA;
+      --text:       #EEEEF4;
+      --text-2:     #8E8EA0;
+      --text-3:     #55556A;
+      --radius:     12px;
+      --radius-lg:  20px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ─────────────────────────────────────────────────── */
+    #cs-nav{position:fixed;top:0;left:0;width:100%;z-index:100;padding:2rem 0;background:transparent;border-bottom:none;height:auto;pointer-events:none;transform:translateY(-100%);animation:csNavDown 1s ease 0.5s forwards;transition:padding .5s}
+    #cs-nav.scrolled{padding:1rem 0}
+    @keyframes csNavDown{to{transform:translateY(0)}}
+    .cs-nav-in{max-width:80rem;margin:0 auto;padding:0 3rem;display:flex;align-items:center;justify-content:space-between;pointer-events:auto}
+    .cs-nav-logo{font-family:'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:-.05em;color:#fff;text-decoration:none;transition:color .3s}
+    .cs-nav-logo:hover{color:#eaff00}
+    .cs-nav-pills{display:flex;gap:.25rem;background:rgba(255,255,255,.05);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);padding:.25rem;border-radius:999px}
+    .cs-nav-pill{padding:.5rem 1.5rem;border-radius:999px;font-size:.875rem;font-family:'Inter',sans-serif;color:rgba(255,255,255,.7);text-decoration:none;transition:all .3s;letter-spacing:0;text-transform:none}
+    .cs-nav-pill:hover{color:#000;background:#fff}
+    .cs-nav-res{color:rgba(255,255,255,.9)!important;border:1px solid rgba(255,255,255,.25);margin-left:.25rem}
+    .cs-nav-res:hover{background:#eaff00!important;color:#000!important;border-color:#eaff00!important}
+    @media(max-width:768px){.cs-nav-in{padding:0 1.5rem}.cs-nav-pills{display:none}}
+
+    /* ── Layout ───────────────────────────────────────────────── */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 40px; }
+    /* ensure hero container aligns exactly with other section containers */
+    #hero .container { width: 100%; }
+    section { padding: 100px 0; }
+    section.alt { background: var(--bg-2); }
+    .divider { width: 100%; height: 1px; background: var(--border); }
+
+    /* ── Section label ────────────────────────────────────────── */
+    .section-label {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 20px;
+    }
+    .section-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--accent); }
+
+    /* ── Typography ───────────────────────────────────────────── */
+    h1, h2, h3, h4 {
+      font-family: 'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;
+      font-weight: 700; line-height: 1.15;
+    }
+    .hero-title {
+      font-size: clamp(80px, 13vw, 140px);
+      letter-spacing: -0.02em; line-height: 1.05; padding-bottom: 0.15em;
+      background: linear-gradient(135deg, #FFFFFF 0%, #3A6000 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; display: inline-block;
+    }
+    h2.section-title { font-size: clamp(28px, 3.5vw, 44px); letter-spacing: -0.02em; margin-bottom: 20px; color: var(--text); }
+    h3.subsection-title { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    p { color: var(--text-2); font-size: 16px; line-height: 1.75; }
+    p.lead { font-size: 19px; color: var(--text-2); line-height: 1.65; max-width: 640px; }
+
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Hero ─────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; padding-top: 80px; position: relative; overflow: hidden;
+    }
+    #hero::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 30%, rgba(132,204,22,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: 12px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 28px; display: flex; align-items: center; gap: 12px;
+    }
+    .hero-eyebrow::before { content: ''; display: block; width: 32px; height: 1px; background: var(--accent); }
+    .hero-sub {
+      font-family: 'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;
+      font-size: clamp(16px, 2vw, 22px); font-weight: 400; color: var(--text-2);
+      max-width: 600px; margin-top: 24px; line-height: 1.55;
+    }
+    .hero-divider { width: 100%; height: 1px; background: var(--border); margin-top: 60px; }
+    .hero-tags { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+    .hero-tag {
+      padding: 6px 16px; border-radius: 100px; font-size: 12px; font-weight: 500;
+      background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-mid);
+      letter-spacing: 0.05em;
+    }
+    .hero-tag.blue { background: var(--blue-dim); color: var(--blue); border-color: rgba(56,189,248,0.3); }
+
+    /* Hero phone hero image */
+    .hero-visual {
+      margin-top: 72px;
+      display: flex; justify-content: center; align-items: flex-end;
+      gap: 20px; padding-bottom: 0;
+    }
+
+    /* ── Phone Frame ──────────────────────────────────────────── */
+    .phone {
+      position: relative;
+      background: #0a0a0a;
+      border-radius: 44px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      border: 10px solid #0a0a0a;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .phone .screen {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 8px;
+    }
+    /* uploaded image inside phone */
+    .phone img {
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      display: block;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      -ms-interpolation-mode: nearest-neighbor;
+    }
+
+    .phone.sm  { width: 180px; height: 390px; }
+    .phone.md  { width: 220px; height: 474px; }
+    .phone.lg  { width: 260px; height: 560px; }
+    .phone.xl  { width: 300px; height: 648px; }
+
+    .phone-label {
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--text-3); text-align: center; margin-top: 14px;
+    }
+    /* Phone + label stack: offset moves both together */
+    .phones-group > div,
+    .phones-group > div.offset-up,
+    .phones-group > div.offset-down {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    /* ── Consistent label baseline across offset phones ─────────────────── */
+    .phones-group > div {
+      position: relative;
+      padding-bottom: 40px;   /* reserve fixed space below every phone for its label */
+    }
+    .phones-group .phone-label {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      margin-top: 0;          /* override the generic margin — label is absolutely placed */
+    }
+
+    /* placeholder screen content */
+    .ph-screen {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; padding-top: 36px;
+    }
+    .ph-icon { font-size: 22px; }
+    .ph-text { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); text-align: center; padding: 0 12px; }
+
+    /* screen section row */
+    .screen-row {
+      display: flex; align-items: flex-start; gap: 60px;
+    }
+    .screen-row.reverse { flex-direction: row-reverse; }
+
+    .screen-info { flex: 0 0 340px; padding-top: 12px; }
+    .screen-info .section-label { margin-bottom: 12px; }
+
+    .screen-desc { font-size: 15px; color: var(--text-2); line-height: 1.75; margin-top: 12px; }
+
+    .phones-group { display: flex; align-items: flex-end; gap: 14px; flex: 1; }
+    .phones-group.center { justify-content: center; }
+    .phones-group.right  { justify-content: flex-end; }
+
+    /* offset stagger */
+    .phone.offset-up   { transform: translateY(-30px); }
+    .phone.offset-down { transform: translateY(30px); }
+
+    /* ── Design System ────────────────────────────────────────── */
+    .ds-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+    .ds-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 36px; }
+
+    .lato-specimen { font-family: 'Lato', sans-serif; font-size: 80px; font-weight: 900; color: var(--text); line-height: 1; margin-bottom: 20px; letter-spacing: -0.02em; }
+    .lato-weights { display: flex; gap: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .lato-wt-sample { font-family: 'Lato', sans-serif; font-size: 26px; color: var(--text); margin-bottom: 4px; }
+    .lato-wt-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em; }
+    .lato-chars { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+    .lato-char { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; font-family: 'Lato', sans-serif; font-size: 20px; color: var(--text); }
+
+    .color-swatches { display: flex; flex-direction: column; gap: 10px; }
+    .swatch { border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+    .swatch-name { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; }
+    .swatch-hex  { font-size: 10px; letter-spacing: 0.08em; opacity: 0.7; font-family: monospace; }
+
+    .icons-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .icon-chip {
+      width: 44px; height: 44px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+
+    /* ── Screen sections ──────────────────────────────────────── */
+    .screen-section { padding: 80px 0; }
+    .screen-section + .screen-section { border-top: 1px solid var(--border); }
+    .screen-section.highlight { background: var(--bg-2); margin: 0 -40px; padding: 80px 40px; border-radius: var(--radius-lg); }
+
+    /* ── Explore grid ─────────────────────────────────────────── */
+    .explore-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 20px;
+    }
+    .explore-item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+    /* ── Thank you ────────────────────────────────────────────── */
+    #thankyou {
+      min-height: 40vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    #thankyou::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(132,204,22,0.06) 0%, transparent 70%);
+    }
+    .ty-text {
+      font-family: 'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;
+      font-size: clamp(32px, 5vw, 64px); font-weight: 700; color: var(--text);
+      letter-spacing: -0.02em; position: relative; z-index: 1;
+    }
+    .ty-sub { font-size: 15px; color: var(--text-3); margin-top: 12px; position: relative; z-index: 1; }
+    .ty-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 28px; padding: 12px 28px; border-radius: 100px;
+      background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-mid);
+      text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 0.06em;
+      transition: background 0.2s, box-shadow 0.2s; position: relative; z-index: 1;
+    }
+    .ty-link:hover { background: rgba(132,204,22,0.2); box-shadow: 0 0 0 4px rgba(132,204,22,0.08); }
+
+    /* ── Footer ───────────────────────────────────────────────── */
+    footer { padding: 40px 0; border-top: 1px solid var(--border); text-align: center; }
+    footer p { font-size: 13px; color: var(--text-3); }
+
+    @media (max-width: 900px) {
+      .container { padding: 0 24px; }
+      section { padding: 72px 0; }
+      .screen-row, .screen-row.reverse { flex-direction: column; gap: 36px; }
+      .screen-info { flex: none; width: 100%; }
+      .ds-grid { grid-template-columns: 1fr; }
+      .explore-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    #cs-nav{position:fixed;top:0;left:0;width:100%;z-index:100;padding:2rem 0;background:transparent;border-bottom:none;height:auto;pointer-events:none;transform:translateY(-100%);animation:csNavDown 1s ease 0.5s forwards;transition:padding .5s}
+    #cs-nav.scrolled{padding:1rem 0}
+    @keyframes csNavDown{to{transform:translateY(0)}}
+    .cs-nav-in{max-width:80rem;margin:0 auto;padding:0 3rem;display:flex;align-items:center;justify-content:space-between;pointer-events:auto}
+    .cs-nav-logo{font-family:'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:-.05em;color:#fff;text-decoration:none;transition:color .3s}
+    .cs-nav-logo:hover{color:#eaff00}
+    .cs-nav-pills{display:flex;gap:.25rem;background:rgba(255,255,255,.05);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);padding:.25rem;border-radius:999px}
+    .cs-nav-pill{padding:.5rem 1.5rem;border-radius:999px;font-size:.875rem;font-family:'Inter',sans-serif;color:rgba(255,255,255,.7);text-decoration:none;transition:all .3s;letter-spacing:0;text-transform:none}
+    .cs-nav-pill:hover{color:#000;background:#fff}
+    .cs-nav-res{color:rgba(255,255,255,.9)!important;border:1px solid rgba(255,255,255,.25);margin-left:.25rem}
+    .cs-nav-res:hover{background:#eaff00!important;color:#000!important;border-color:#eaff00!important}
+    @media(max-width:768px){.cs-nav-in{padding:0 1.5rem}.cs-nav-pills{display:none}}
+
+    /* ── Layout ───────────────────────────────────────────────── */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 40px; }
+    /* ensure hero container aligns exactly with other section containers */
+    #hero .container { width: 100%; }
+    section { padding: 100px 0; }
+    section.alt { background: var(--bg-2); }
+    .divider { width: 100%; height: 1px; background: var(--border); }
+
+    /* ── Section label ────────────────────────────────────────── */
+    .section-label {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 20px;
+    }
+    .section-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--accent); }
+
+    /* ── Typography ───────────────────────────────────────────── */
+    h1, h2, h3, h4 {
+      font-family: 'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;
+      font-weight: 700; line-height: 1.15;
+    }
+    .hero-title {
+      font-size: clamp(80px, 13vw, 140px);
+      letter-spacing: -0.02em; line-height: 1.05; padding-bottom: 0.15em;
+      background: linear-gradient(135deg, #FFFFFF 0%, #3A6000 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; display: inline-block;
+    }
+    h2.section-title { font-size: clamp(28px, 3.5vw, 44px); letter-spacing: -0.02em; margin-bottom: 20px; color: var(--text); }
+    h3.subsection-title { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    p { color: var(--text-2); font-size: 16px; line-height: 1.75; }
+    p.lead { font-size: 19px; color: var(--text-2); line-height: 1.65; max-width: 640px; }
+
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Hero ─────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; padding-top: 80px; position: relative; overflow: hidden;
+    }
+    #hero::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 30%, rgba(132,204,22,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: 12px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 28px; display: flex; align-items: center; gap: 12px;
+    }
+    .hero-eyebrow::before { content: ''; display: block; width: 32px; height: 1px; background: var(--accent); }
+    .hero-sub {
+      font-family: 'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;
+      font-size: clamp(16px, 2vw, 22px); font-weight: 400; color: var(--text-2);
+      max-width: 600px; margin-top: 24px; line-height: 1.55;
+    }
+    .hero-divider { width: 100%; height: 1px; background: var(--border); margin-top: 60px; }
+    .hero-tags { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+    .hero-tag {
+      padding: 6px 16px; border-radius: 100px; font-size: 12px; font-weight: 500;
+      background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-mid);
+      letter-spacing: 0.05em;
+    }
+    .hero-tag.blue { background: var(--blue-dim); color: var(--blue); border-color: rgba(56,189,248,0.3); }
+
+    /* Hero phone hero image */
+    .hero-visual {
+      margin-top: 72px;
+      display: flex; justify-content: center; align-items: flex-end;
+      gap: 20px; padding-bottom: 0;
+    }
+
+    /* ── Phone Frame ──────────────────────────────────────────── */
+    .phone {
+      position: relative;
+      background: #0a0a0a;
+      border-radius: 44px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      border: 10px solid #0a0a0a;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .phone .screen {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 8px;
+    }
+    /* uploaded image inside phone */
+    .phone img {
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      display: block;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      -ms-interpolation-mode: nearest-neighbor;
+    }
+
+    .phone.sm  { width: 180px; height: 390px; }
+    .phone.md  { width: 220px; height: 474px; }
+    .phone.lg  { width: 260px; height: 560px; }
+    .phone.xl  { width: 300px; height: 648px; }
+
+    .phone-label {
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--text-3); text-align: center; margin-top: 14px;
+    }
+    /* Phone + label stack: offset moves both together */
+    .phones-group > div,
+    .phones-group > div.offset-up,
+    .phones-group > div.offset-down {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    /* ── Consistent label baseline across offset phones ─────────────────── */
+    .phones-group > div {
+      position: relative;
+      padding-bottom: 40px;   /* reserve fixed space below every phone for its label */
+    }
+    .phones-group .phone-label {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      margin-top: 0;          /* override the generic margin — label is absolutely placed */
+    }
+
+    /* placeholder screen content */
+    .ph-screen {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; padding-top: 36px;
+    }
+    .ph-icon { font-size: 22px; }
+    .ph-text { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); text-align: center; padding: 0 12px; }
+
+    /* screen section row */
+    .screen-row {
+      display: flex; align-items: flex-start; gap: 60px;
+    }
+    .screen-row.reverse { flex-direction: row-reverse; }
+
+    .screen-info { flex: 0 0 340px; padding-top: 12px; }
+    .screen-info .section-label { margin-bottom: 12px; }
+
+    .screen-desc { font-size: 15px; color: var(--text-2); line-height: 1.75; margin-top: 12px; }
+
+    .phones-group { display: flex; align-items: flex-end; gap: 14px; flex: 1; }
+    .phones-group.center { justify-content: center; }
+    .phones-group.right  { justify-content: flex-end; }
+
+    /* offset stagger */
+    .phone.offset-up   { transform: translateY(-30px); }
+    .phone.offset-down { transform: translateY(30px); }
+
+    /* ── Design System ────────────────────────────────────────── */
+    .ds-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+    .ds-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 36px; }
+
+    .lato-specimen { font-family: 'Lato', sans-serif; font-size: 80px; font-weight: 900; color: var(--text); line-height: 1; margin-bottom: 20px; letter-spacing: -0.02em; }
+    .lato-weights { display: flex; gap: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .lato-wt-sample { font-family: 'Lato', sans-serif; font-size: 26px; color: var(--text); margin-bottom: 4px; }
+    .lato-wt-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em; }
+    .lato-chars { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+    .lato-char { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; font-family: 'Lato', sans-serif; font-size: 20px; color: var(--text); }
+
+    .color-swatches { display: flex; flex-direction: column; gap: 10px; }
+    .swatch { border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+    .swatch-name { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; }
+    .swatch-hex  { font-size: 10px; letter-spacing: 0.08em; opacity: 0.7; font-family: monospace; }
+
+    .icons-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .icon-chip {
+      width: 44px; height: 44px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+
+    /* ── Screen sections ──────────────────────────────────────── */
+    .screen-section { padding: 80px 0; }
+    .screen-section + .screen-section { border-top: 1px solid var(--border); }
+    .screen-section.highlight { background: var(--bg-2); margin: 0 -40px; padding: 80px 40px; border-radius: var(--radius-lg); }
+
+    /* ── Explore grid ─────────────────────────────────────────── */
+    .explore-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 20px;
+    }
+    .explore-item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+    /* ── Thank you ────────────────────────────────────────────── */
+    #thankyou {
+      min-height: 40vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    #thankyou::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(132,204,22,0.06) 0%, transparent 70%);
+    }
+    .ty-text {
+      font-family: 'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;
+      font-size: clamp(32px, 5vw, 64px); font-weight: 700; color: var(--text);
+      letter-spacing: -0.02em; position: relative; z-index: 1;
+    }
+    .ty-sub { font-size: 15px; color: var(--text-3); margin-top: 12px; position: relative; z-index: 1; }
+    .ty-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 28px; padding: 12px 28px; border-radius: 100px;
+      background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-mid);
+      text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 0.06em;
+      transition: background 0.2s, box-shadow 0.2s; position: relative; z-index: 1;
+    }
+    .ty-link:hover { background: rgba(132,204,22,0.2); box-shadow: 0 0 0 4px rgba(132,204,22,0.08); }
+
+    /* ── Footer ───────────────────────────────────────────────── */
+    footer { padding: 40px 0; border-top: 1px solid var(--border); text-align: center; }
+    footer p { font-size: 13px; color: var(--text-3); }
+
+    @media (max-width: 900px) {
+      .container { padding: 0 24px; }
+      section { padding: 72px 0; }
+      .screen-row, .screen-row.reverse { flex-direction: column; gap: 36px; }
+      .screen-info { flex: none; width: 100%; }
+      .ds-grid { grid-template-columns: 1fr; }
+      .explore-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    #cs-nav{position:fixed;top:0;left:0;width:100%;z-index:100;padding:2rem 0;background:transparent;backdrop-filter:none;border-bottom:none;height:auto;pointer-events:none;transform:translateY(-100%);animation:csNavDown 1s ease 0.5s forwards;transition:padding .5s}
+    #cs-nav.scrolled{padding:1rem 0}
+    @keyframes csNavDown{to{transform:translateY(0)}}
+    .cs-nav-in{max-width:80rem;margin:0 auto;padding:0 3rem;display:flex;align-items:center;justify-content:space-between;pointer-events:auto}
+    .cs-nav-logo{font-family:'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:-.05em;color:#fff;text-decoration:none;transition:color .3s}
+    .cs-nav-logo:hover{color:#eaff00}
+    .cs-nav-pills{display:flex;gap:.25rem;background:rgba(255,255,255,.05);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);padding:.25rem;border-radius:999px}
+    .cs-nav-pill{padding:.5rem 1.5rem;border-radius:999px;font-size:.875rem;color:rgba(255,255,255,.7);text-decoration:none;transition:all .3s;letter-spacing:0;text-transform:none}
+    .cs-nav-pill:hover{color:#000;background:#fff}
+    .cs-nav-resume{padding:.5rem 1.5rem;border-radius:999px;font-size:.875rem;color:rgba(255,255,255,.9);text-decoration:none;border:1px solid rgba(255,255,255,.25);margin-left:.25rem;transition:all .3s}
+    .cs-nav-resume:hover{background:#eaff00;color:#000;border-color:#eaff00}
+    @media(max-width:768px){.cs-nav-in{padding:0 1.5rem}.cs-nav-pills{display:none}}
+
+    /* ── Case Study Pagination ──────────────────────────────── */
+    .cs-pagination{border-top:1px solid var(--border);background:var(--bg)}
+    .cs-pagination .container{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;padding-top:4rem;padding-bottom:4rem}
+    .cs-pg-btn{display:flex;flex-direction:column;gap:0.25rem;text-decoration:none;padding:1.5rem 2rem;border-radius:16px;border:1px solid transparent;transition:all 0.4s cubic-bezier(.16,1,.3,1)}
+    .cs-pg-btn:hover{border-color:var(--border-2);background:rgba(255,255,255,0.02);transform:translateY(-3px)}
+    .cs-pg-next{text-align:right;margin-left:auto;width:100%}
+    .cs-pg-dir{font-size:11px;font-family:'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-3);margin-bottom:0.375rem;display:block}
+    .cs-pg-name{font-family:'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;font-size:clamp(1.5rem,3vw,2.5rem);font-weight:700;color:var(--text);line-height:1.1;transition:color 0.3s;display:block}
+    .cs-pg-btn:hover .cs-pg-name{color:var(--accent)}
+    .cs-pg-tagline{font-size:13px;font-family:'Inter',sans-serif;color:var(--text-3);margin-top:0.375rem;display:block;max-width:28rem}
+    .cs-pg-next .cs-pg-tagline{margin-left:auto}
+    .cs-pg-home-wrap{display:flex;justify-content:center}
+    .cs-pg-home-btn{display:flex;flex-direction:column;align-items:center;gap:0.5rem;text-decoration:none;padding:1rem}
+    .cs-pg-home-ring{width:48px;height:48px;border-radius:50%;border:1px solid var(--border-2);display:flex;align-items:center;justify-content:center;transition:all 0.3s;color:var(--text-2)}
+    .cs-pg-home-btn:hover .cs-pg-home-ring{border-color:var(--text-2);transform:scale(1.08)}
+    .cs-pg-home-label{font-size:10px;font-family:'ITC Avant Garde Gothic','ITC Avant Garde','Century Gothic','Futura','Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-3);transition:color 0.3s}
+    .cs-pg-home-btn:hover .cs-pg-home-label{color:var(--text-2)}
+    @media(max-width:768px){.cs-pagination .container{grid-template-columns:1fr 1fr}.cs-pg-home-wrap{display:none}.cs-pg-btn{padding:1rem}.cs-pg-name{font-size:1.25rem}.cs-pg-tagline{display:none}}
+  </style>
+</head>
+<body>
+
+  <nav id="cs-nav">
+    <div class="cs-nav-in">
+      <a href="dst-portfolio.html" class="cs-nav-logo">DST.</a>
+      <div class="cs-nav-pills">
+        <a href="dst-portfolio.html#about" class="cs-nav-pill">About</a>
+        <a href="dst-portfolio.html#work" class="cs-nav-pill">Work</a>
+        <a href="dst-portfolio.html#contact" class="cs-nav-pill">Contact</a>
+        <a href="#" class="cs-nav-pill cs-nav-res" onclick="event.preventDefault()">Resume</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── HERO ──────────────────────────────────────────────────── -->
+  <section id="hero">
+    <div class="container">
+      <p class="hero-eyebrow">Visual Showcase · Online Grocery</p>
+      <h1 class="hero-title">ZipCart</h1>
+      <p class="hero-sub">Online grocery shopping made simple</p>
+      <div class="hero-tags">
+        <span class="hero-tag">Mobile App</span>
+        <span class="hero-tag">E-Commerce</span>
+        <span class="hero-tag blue">UX / UI Design</span>
+        <span class="hero-tag">Figma</span>
+      </div>
+      <div class="hero-divider"></div>
+
+      <!-- Hero phone group -->
+      <div class="hero-visual fade-in">
+        <div style="display:flex; align-items:flex-end; gap:16px;">
+          <div class="offset-down">
+            <div class="phone md">
+              <img src="zipcart-screens/zc-figma-overview.svg" alt="Dashboard">
+            </div>
+            <div class="phone-label">Dashboard</div>
+          </div>
+          <div>
+            <div class="phone lg">
+              <img src="zipcart-screens/zc-dashboard.svg" alt="Home Screen">
+            </div>
+            <div class="phone-label">Home</div>
+          </div>
+          <div class="offset-down">
+            <div class="phone md">
+              <img src="zipcart-screens/zc-home-screen.svg" alt="Order Confirmed">
+            </div>
+            <div class="phone-label">Order Confirmed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── DESIGN SYSTEM ──────────────────────────────────────────── -->
+  <section class="alt">
+    <div class="container">
+      <div class="section-label fade-in">Design System</div>
+      <h2 class="section-title fade-in">Visual foundations</h2>
+      <div class="ds-grid fade-in" style="margin-top:40px;">
+
+        <!-- Typeface -->
+        <div class="ds-card">
+          <div class="section-label" style="margin-bottom:16px">Typeface</div>
+          <div class="lato-specimen">Lato</div>
+          <div style="font-size:13px; color:var(--text-3); margin-bottom:20px; letter-spacing:0.06em;">Regular · Medium · Semibold · Bold</div>
+          <div class="lato-weights">
+            <div><div class="lato-wt-sample" style="font-weight:300">Ag</div><div class="lato-wt-label">Regular</div></div>
+            <div><div class="lato-wt-sample" style="font-weight:500">Ag</div><div class="lato-wt-label">Medium</div></div>
+            <div><div class="lato-wt-sample" style="font-weight:700">Ag</div><div class="lato-wt-label">Semibold</div></div>
+            <div><div class="lato-wt-sample" style="font-weight:900">Ag</div><div class="lato-wt-label">Bold</div></div>
+          </div>
+          <div class="lato-chars">
+            <span class="lato-char">Aa</span>
+            <span class="lato-char">Bb</span>
+            <span class="lato-char">Cc</span>
+            <span class="lato-char">Dd</span>
+            <span class="lato-char">1234</span>
+          </div>
+        </div>
+
+        <!-- Colours -->
+        <div class="ds-card">
+          <div class="section-label" style="margin-bottom:16px">Colours</div>
+          <div class="color-swatches">
+            <div class="swatch" style="background:#22C55E;">
+              <span class="swatch-name" style="color:#052e16">Primary Green</span>
+              <span class="swatch-hex" style="color:#052e16">#22C55E</span>
+            </div>
+            <div class="swatch" style="background:#1C1C24; border:1px solid var(--border-2);">
+              <span class="swatch-name" style="color:#aaa">Background Dark</span>
+              <span class="swatch-hex" style="color:#666">#1C1C24</span>
+            </div>
+            <div class="swatch" style="background:#3A3A4A;">
+              <span class="swatch-name" style="color:#ccc">Surface Mid</span>
+              <span class="swatch-hex" style="color:#999">#3A3A4A</span>
+            </div>
+            <div class="swatch" style="background:#EEEEF4;">
+              <span class="swatch-name" style="color:#333">Text Light</span>
+              <span class="swatch-hex" style="color:#555">#EEEEF4</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Icons -->
+        <div class="ds-card">
+          <div class="section-label" style="margin-bottom:16px">Icons</div>
+          <p style="font-size:13px; margin-bottom:20px;">Consistent icon set used across all screens for navigation, actions, and categories.</p>
+          <div class="icons-grid">
+            <div class="icon-chip">🛒</div><div class="icon-chip">🔍</div><div class="icon-chip">🏠</div>
+            <div class="icon-chip">💳</div><div class="icon-chip">📦</div><div class="icon-chip">❤️</div>
+            <div class="icon-chip">📍</div><div class="icon-chip">🔔</div><div class="icon-chip">⭐</div>
+            <div class="icon-chip">🥕</div><div class="icon-chip">🥛</div><div class="icon-chip">🍞</div>
+            <div class="icon-chip">🛍️</div><div class="icon-chip">👤</div><div class="icon-chip">↩️</div>
+            <div class="icon-chip">🧾</div><div class="icon-chip">🚛</div><div class="icon-chip">✅</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── VISUAL DESIGNS ─────────────────────────────────────────── -->
+  <section>
+    <div class="container">
+      <div class="section-label fade-in">Visual Designs</div>
+      <h2 class="section-title fade-in">Screen by screen</h2>
+
+      <!-- 1. Launch Screens -->
+      <div class="screen-section fade-in" style="margin-top:48px;">
+        <div class="screen-row">
+          <div class="screen-info">
+            <div class="section-label" style="color:var(--text-3); font-size:10px;">01</div>
+            <h3 class="subsection-title">Launch Screens</h3>
+            <p class="screen-desc">First impressions — the onboarding and authentication flow that gets users from install to shopping as quickly as possible.</p>
+          </div>
+          <div class="phones-group">
+            <div>
+              <div class="phone sm"><img src="zipcart-screens/zc-launch-screens.svg" alt="Splash 1"></div>
+              <div class="phone-label">Splash 1</div>
+            </div>
+            <div class="offset-up">
+              <div class="phone sm"><img src="zipcart-screens/zc-splash-1.svg" alt="Sign Up"></div>
+              <div class="phone-label">Sign Up</div>
+            </div>
+            <div class="offset-up">
+              <div class="phone sm"><img src="zipcart-screens/zc-login-new.svg" alt="Login"></div>
+              <div class="phone-label">Login</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Zipcode & Truck Selection -->
+      <div class="screen-section fade-in">
+        <div class="screen-row reverse">
+          <div class="screen-info">
+            <div class="section-label" style="color:var(--text-3); font-size:10px;">02</div>
+            <h3 class="subsection-title">Zipcode &amp; Truck Selection</h3>
+            <p class="screen-desc">The user can enter their zipcode or use current location to detect the nearest trucks available to shop from.</p>
+          </div>
+          <div class="phones-group">
+            <div>
+              <div class="phone md"><img src="zipcart-screens/zc-splash-2.svg" alt="Zipcode"></div>
+              <div class="phone-label">Zipcode</div>
+            </div>
+            <div class="offset-up">
+              <div class="phone md"><img src="zipcart-screens/zc-zipcode.svg" alt="Truck Select"></div>
+              <div class="phone-label">Truck Select</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Home Screen -->
+      <div class="screen-section fade-in">
+        <div class="screen-row">
+          <div class="screen-info">
+            <div class="section-label" style="color:var(--text-3); font-size:10px;">03</div>
+            <h3 class="subsection-title">Home Screen</h3>
+            <p class="screen-desc">A navigation menu for easy browsing, a search bar for quick item lookup. Users can explore featured products, browse different categories and manage their shopping lists.</p>
+          </div>
+          <div class="phones-group">
+            <div>
+              <div class="phone lg"><img src="zipcart-screens/zc-home-screen-2.svg" alt="Dashboard Main"></div>
+              <div class="phone-label">Dashboard Main</div>
+            </div>
+            <div class="offset-down">
+              <div class="phone md"><img src="zipcart-screens/zc-dashboard-main.svg" alt="Search"></div>
+              <div class="phone-label">Search</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Categories -->
+      <div class="screen-section fade-in">
+        <div class="screen-row reverse">
+          <div class="screen-info">
+            <div class="section-label" style="color:var(--text-3); font-size:10px;">04</div>
+            <h3 class="subsection-title">Categories</h3>
+            <p class="screen-desc">Organise and group similar products together for easy navigation. Categories mirror different sections of the grocery store — allowing users to browse naturally.</p>
+          </div>
+          <div class="phones-group">
+            <div>
+              <div class="phone lg"><img src="zipcart-screens/zc-categories.svg" alt="Categories"></div>
+              <div class="phone-label">Categories</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. My Items -->
+      <div class="screen-section fade-in">
+        <div class="screen-row">
+          <div class="screen-info">
+            <div class="section-label" style="color:var(--text-3); font-size:10px;">05</div>
+            <h3 class="subsection-title">My Items</h3>
+            <p class="screen-desc">Users can find all their wishlisted items, Buy Again, and favourite products easily at one place by a click or scroll. Store receipts are also managed in this section.</p>
+          </div>
+          <div class="phones-group">
+            <div class="offset-down">
+              <div class="phone sm"><img src="zipcart-screens/zc-wishlist.svg" alt="Wishlist"></div>
+              <div class="phone-label">Wishlist</div>
+            </div>
+            <div>
+              <div class="phone sm"><img src="zipcart-screens/zc-buy-again.svg" alt="Buy Again"></div>
+              <div class="phone-label">Buy Again</div>
+            </div>
+            <div class="offset-down">
+              <div class="phone sm"><img src="zipcart-screens/zc-favourites.svg" alt="Favourites"></div>
+              <div class="phone-label">Favourites</div>
+            </div>
+            <div>
+              <div class="phone sm"><img src="zipcart-screens/zc-receipts.svg" alt="Receipts"></div>
+              <div class="phone-label">Receipts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Item Details & Cart -->
+      <div class="screen-section fade-in">
+        <div class="screen-row reverse">
+          <div class="screen-info">
+            <div class="section-label" style="color:var(--text-3); font-size:10px;">06</div>
+            <h3 class="subsection-title">Item Details &amp; Cart</h3>
+            <p class="screen-desc">Tap any product to see its full details — price, description, and smart recommendations. When you're ready, review everything in your cart, update quantities, and head straight to checkout.</p>
+          </div>
+          <div class="phones-group">
+            <div>
+              <div class="phone lg"><img src="zipcart-screens/zc-item-detail.svg" alt="Item Details"></div>
+              <div class="phone-label">Item Detail</div>
+            </div>
+            <div class="offset-up">
+              <div class="phone md"><img src="zipcart-screens/zc-item-details-old.svg" alt="Cart"></div>
+              <div class="phone-label">My Cart</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Checkout -->
+      <div class="screen-section fade-in">
+        <div class="screen-row reverse">
+          <div class="screen-info">
+            <div class="section-label" style="color:var(--text-3); font-size:10px;">07</div>
+            <h3 class="subsection-title">Checkout</h3>
+            <p class="screen-desc">The checkout process ensures a secure and seamless transaction — allowing users to complete their grocery shopping and have items delivered or prepared for pickup.</p>
+          </div>
+          <div class="phones-group">
+            <div>
+              <div class="phone md"><img src="zipcart-screens/zc-checkout.svg" alt="Delivery"></div>
+              <div class="phone-label">Delivery</div>
+            </div>
+            <div class="offset-up">
+              <div class="phone md"><img src="zipcart-screens/zc-delivery.svg" alt="Pickup"></div>
+              <div class="phone-label">Pickup</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /container -->
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── EXPLORE SCREENS ────────────────────────────────────────── -->
+  <section class="alt">
+    <div class="container">
+      <div class="section-label fade-in">Explore Screens</div>
+      <h2 class="section-title fade-in">Every corner of the app</h2>
+      <p style="max-width:580px; margin-bottom:52px" class="fade-in">Additional screens covering search, saved addresses, notifications, receipts, and payments — every corner of the app fully designed.</p>
+
+      <div class="explore-grid fade-in">
+        <div class="explore-item">
+          <div class="phone sm"><img src="zipcart-screens/zc-app-corners.svg" alt="Add Address"></div>
+          <div class="phone-label">Add Address</div>
+        </div>
+        <div class="explore-item">
+          <div class="phone sm"><img src="zipcart-screens/zc-add-address.svg" alt="Search"></div>
+          <div class="phone-label">Search</div>
+        </div>
+        <div class="explore-item">
+          <div class="phone sm"><img src="zipcart-screens/zc-receipts.svg" alt="Receipts"></div>
+          <div class="phone-label">Receipts</div>
+        </div>
+        <div class="explore-item">
+          <div class="phone sm"><img src="zipcart-screens/zc-search.svg" alt="Addresses"></div>
+          <div class="phone-label">Addresses</div>
+        </div>
+        <div class="explore-item">
+          <div class="phone sm"><img src="zipcart-screens/zc-notifications.svg" alt="Notifications"></div>
+          <div class="phone-label">Notifications</div>
+        </div>
+        <div class="explore-item">
+          <div class="phone sm"><img src="zipcart-screens/zc-addresses.svg" alt="Account"></div>
+          <div class="phone-label">Account</div>
+        </div>
+        <div class="explore-item">
+          <div class="phone sm"><img src="zipcart-screens/zc-account.svg" alt="Coupon Code"></div>
+          <div class="phone-label">Coupon</div>
+        </div>
+        <div class="explore-item">
+          <div class="phone sm"><img src="zipcart-screens/zc-coupon-code.svg" alt="Pickup Time"></div>
+          <div class="phone-label">Pickup Time</div>
+        </div>
+        <div class="explore-item">
+          <div class="phone sm"><img src="zipcart-screens/zc-payment.svg" alt="Payment Method"></div>
+          <div class="phone-label">Payment</div>
+        </div>
+        <div class="explore-item">
+          <div class="phone sm"><img src="zipcart-screens/zc-add-payment.svg" alt="Add Payment"></div>
+          <div class="phone-label">Add Payment</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── THANK YOU ──────────────────────────────────────────────── -->
+  <section id="thankyou">
+    <div class="ty-text fade-in">Thank you for watching</div>
+    <p class="ty-sub fade-in">ZipCart · Visual Showcase · DST Portfolio</p>
+    <a href="zipcart-case-study.html" class="ty-link fade-in">View full case study →</a>
+  </section>
+
+  <!-- ── CASE STUDY NAVIGATION ──────────────────────────────── -->
+  <section class="cs-pagination">
+    <div class="container">
+      <a href="zipcart-case-study.html" class="cs-pg-btn">
+        <span class="cs-pg-dir">← Back to Case Study</span>
+        <span class="cs-pg-name">ZipCart</span>
+        <span class="cs-pg-tagline">View the full research & design process</span>
+      </a>
+      <div class="cs-pg-home-wrap">
+        <a href="dst-portfolio.html#work" class="cs-pg-home-btn">
+          <div class="cs-pg-home-ring">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 3l9 6.75V21a.75.75 0 01-.75.75H3.75A.75.75 0 013 21V9.75z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 21V12h6v9"/></svg>
+          </div>
+          <span class="cs-pg-home-label">All Work</span>
+        </a>
+      </div>
+      <!-- No next — sub-page -->
+      <div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Product Designer — dsteja25@gmail.com</p>
+    </div>
+  </footer>
+
+  <script>
+    const obs = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+    );
+    document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+    const csNav=document.getElementById('cs-nav');if(csNav)window.addEventListener('scroll',function(){csNav.classList.toggle('scrolled',window.scrollY>50)},{passive:true});
+  </script>
+</body>
+</html>
