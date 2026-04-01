@@ -345,7 +345,7 @@ img{display:block;max-width:100%}
       <a href="#about" class="nav-pill" onclick="ss(event,'#about')">About</a>
       <a href="#work" class="nav-pill" onclick="ss(event,'#work')">Work</a>
       <a href="#contact" class="nav-pill" onclick="ss(event,'#contact')">Contact</a>
-      <a href="Durga_Sai_Teja_Resume.pdf" download="Durga_Sai_Teja_Resume.pdf" class="nav-pill nav-pill-res">Resume</a>
+      <a href="#" class="nav-pill nav-pill-res" onclick="openResume(event)">Resume</a>
     </div>
   </div>
 </nav>
@@ -1198,6 +1198,50 @@ if(cepi){
   },{threshold:.1});
   eio.observe(cepi);
 }
+</script>
+
+<!-- Resume Preview Modal -->
+<div id="resume-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:1.5rem;opacity:0;transition:opacity .3s">
+  <div style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:1.25rem;width:100%;max-width:860px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(24px);transition:transform .35s cubic-bezier(.16,1,.3,1)">
+    <!-- Modal header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0">
+      <span style="font-family:'Inter',sans-serif;font-size:.875rem;color:rgba(255,255,255,.5);letter-spacing:.04em;text-transform:uppercase">Resume Preview</span>
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <a href="Durga_Sai_Teja_Resume.pdf" download="Durga_Sai_Teja_Resume.pdf" style="display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.25rem;background:#eaff00;color:#000;font-family:'Inter',sans-serif;font-size:.8125rem;font-weight:600;border-radius:999px;text-decoration:none;transition:all .2s" onmouseover="this.style.background='#d4e600'" onmouseout="this.style.background='#eaff00'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download
+        </a>
+        <button onclick="closeResume()" style="background:rgba(255,255,255,.08);border:none;border-radius:999px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.6);transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <!-- PDF embed -->
+    <iframe src="Durga_Sai_Teja_Resume.pdf" style="flex:1;width:100%;min-height:70vh;border:none;background:#1a1a1a" title="Resume Preview"></iframe>
+  </div>
+</div>
+
+<script>
+function openResume(e){
+  e.preventDefault();
+  const m=document.getElementById('resume-modal');
+  m.style.display='flex';
+  requestAnimationFrame(()=>{
+    m.style.opacity='1';
+    m.querySelector('div').style.transform='translateY(0)';
+  });
+  document.body.style.overflow='hidden';
+}
+function closeResume(){
+  const m=document.getElementById('resume-modal');
+  m.style.opacity='0';
+  m.querySelector('div').style.transform='translateY(24px)';
+  setTimeout(()=>{m.style.display='none';document.body.style.overflow=''},300);
+}
+document.getElementById('resume-modal').addEventListener('click',function(e){
+  if(e.target===this)closeResume();
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeResume();});
 </script>
 </body>
 </html>
